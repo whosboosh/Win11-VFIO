@@ -13,7 +13,7 @@ cleanup () {
 
 	# Restore screen config (needed to reset main monitor which turns off for whatever reason)
 	#ddcutil --display 1 setvcp 60 3
-	sudo -u pi -E /usr/share/xrandr-config.sh
+	#sudo -u pi -E /usr/share/xrandr-config.sh
 
 	# Return CPU power management to default
 	pstate-frequency --set -p auto -n 50
@@ -27,19 +27,19 @@ cleanup () {
 	fi
 
 	# Kill all background processes
-	killall scream-pulse || true
-	killall synergyc || true
+	#killall scream-pulse || true
+	#killall synergyc || true
 
 	# Restart polybar on main monitor
 	#pkill polybar
 
 	# Reset cset
 	echo "Resetting cset groups..."
-	cset shield --reset
+	#cset shield --reset
 
 	echo "Removing libvirt cgroup slice..."
 	sleep 2
-	rmdir /sys/fs/cgroup/cpuset/machine.slice
+	#rmdir /sys/fs/cgroup/cpuset/machine.slice
 
 	echo "Undoing kernel optimizations..."
 	echo fff > /sys/devices/virtual/workqueue/cpumask
@@ -49,7 +49,7 @@ cleanup () {
         sysctl -w kernel.watchdog=1
 
 	#killall polybar
-	sudo -u pi -E sh -c "/home/pi/.config/polybar/bar_launch.sh > /dev/null 2>&1 &disown"
+	#sudo -u pi -E sh -c "/home/pi/.config/polybar/bar_launch.sh > /dev/null 2>&1 &disown"
 	sleep 2
 }
 
@@ -96,7 +96,7 @@ else
 fi
 
 # Move polybar to secondary screen
-killall polybar
+#killall polybar
 
 # Monitor config
 if [[ $TMP_PARAMS == *'--display'* ]]
@@ -107,21 +107,21 @@ fi
 
 # Start synergy for mouse and keyboard sharing
 echo "Starting SynergyC..."
-synergyc 10.0.0.251
-setxkbmap de # Required because synergy doesn't load default for whatever reason. Not needed on US keyboards.
+#synergyc 10.0.0.251
+#setxkbmap de # Required because synergy doesn't load default for whatever reason. Not needed on US keyboards.
 
 # Start Scream-Pulse receiver for audio over the NAT network
 echo "Starting sound receiver..."
-sudo -u pi -E sh -c "scream-pulse -i winbr0" &
+#sudo -u pi -E sh -c "scream-pulse -i winbr0" &
 
-sudo -u pi -E sh -c "env SYSTRAY_MON=\"DisplayPort-0\" /home/pi/.config/polybar/bar_launch.sh > /dev/null 2>&1 &disown"
+#sudo -u pi -E sh -c "env SYSTRAY_MON=\"DisplayPort-0\" /home/pi/.config/polybar/bar_launch.sh > /dev/null 2>&1 &disown"
 
 # Taskset (Move all current processes to unused cores)
 # Done last, so it can move synergy and scream-pulse as well
-cset shield --kthread on --cpu 1-5,7-11
+#cset shield --kthread on --cpu 1-5,7-11
 #echo "Setting cset groups correctly..."
-echo 0 > /sys/fs/cgroup/cpuset/system/cpuset.cpu_exclusive
-echo 0 > /sys/fs/cgroup/cpuset/user/cpuset.cpu_exclusive
+#echo 0 > /sys/fs/cgroup/cpuset/system/cpuset.cpu_exclusive
+#echo 0 > /sys/fs/cgroup/cpuset/user/cpuset.cpu_exclusive
 
 #echo 0 > /sys/fs/cgroup/cpuset/machine.slice/cpuset.cpu_exclusive
 #echo 0-11 > /sys/fs/cgroup/cpuset/machine.slice/cpuset.cpus
@@ -138,7 +138,9 @@ sysctl -w kernel.watchdog=0
 
 # Start VM via virt-manager
 echo "VM starting..."
-virsh start win
+# Remove existing VM
+virsh undefine --nvram win11
+virsh define win11-working.xml
 echo
 
 # Print status and wait for exit

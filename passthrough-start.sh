@@ -139,8 +139,9 @@ sysctl -w kernel.watchdog=0
 # Start VM via virt-manager
 echo "VM starting..."
 # Remove existing VM
-virsh undefine --nvram win11
-virsh define win11-working.xml
+#virsh undefine --nvram win11
+#virsh define win11-working.xml
+virsh start win11
 echo
 
 # Print status and wait for exit

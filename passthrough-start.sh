@@ -16,7 +16,7 @@ cleanup () {
 	#sudo -u pi -E /usr/share/xrandr-config.sh
 
 	# Return CPU power management to default
-	pstate-frequency --set -p auto -n 50
+	#pstate-frequency --set -p auto -n 50
 
 	if [[ $TMP_PARAMS == *'--keep-hugepages'* ]]
 	then
@@ -63,7 +63,7 @@ fi
 
 
 # CPU governor settings (keep CPU frequency up, might not work on older CPUs - use cpupower for those)
-pstate-frequency --set -p max
+#pstate-frequency --set -p max
 
 
 # Hugepages config

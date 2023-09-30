@@ -114,8 +114,6 @@ for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
 sysctl vm.stat_interval=120
 sysctl -w kernel.watchdog=0
 
-./qemu_fifo.sh &
-
 # Start VM via virt-manager
 echo "VM starting..."
 # Remove existing VM

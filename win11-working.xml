@@ -214,7 +214,12 @@ or other application using the libvirt API.
     <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'>
       <listen type='address' address='0.0.0.0'/>
     </graphics>
-    <audio id='1' type='spice'/>
+    <audio id="1" type="jack">
+      <output clientName="win11" connectPorts="USB Audio Speakers"/>
+    </audio>
+    <sound model="ich9">
+      <alias name="sound0"/>
+    </sound>
     <video>
       <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
@@ -306,4 +311,8 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
     </memballoon>
   </devices>
+  <qemu:commandline>
+    <qemu:env name="PIPEWIRE_RUNTIME_DIR" value="/run/user/1000"/>
+    <qemu:env name="PIPEWIRE_LATENCY" value="512/48000"/>
+  </qemu:commandline>  
 </domain>

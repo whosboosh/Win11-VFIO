@@ -27,7 +27,7 @@ cleanup () {
 	fi
 
 	# Kill all background processes
-	#killall scream-pulse || true
+	killall scream || true
 	#killall synergyc || true
 
 	# Restart polybar on main monitor
@@ -95,6 +95,10 @@ if [[ "$STARTING_HUGEPAGES" -lt "$HUGEPAGES" ]]; then
 else
     echo "Hugepages already found, let's use those!"
 fi
+
+# Start Scream receiver for audio over the NAT network
+echo "Starting sound receiver..."
+scream -i br0 &
 
 # Taskset (Move all current processes to unused cores)
 # Done last, so it can move synergy and scream-pulse as well

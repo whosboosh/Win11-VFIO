@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# SOURCE : https://gitlab.com/risingprismtv/single-gpu-passthrough/-/blob/master/hooks/qemu
+# IMPORTANT! If you want to add more VMS with different names copy the if/fi bellow as is and change "win10" to the name of the VM
+OBJECT="$1"
+OPERATION="$2"
+
+if [[ $OBJECT == "win11" ]]; then
+	case "$OPERATION" in
+        "prepare")
+		systemctl set-property --runtime -- system.slice AllowedCPUs=16-19
+    		systemctl set-property --runtime -- user.slice AllowedCPUs=16-19
+    		systemctl set-property --runtime -- init.scope AllowedCPUs=16-19
+                systemctl start libvirt-nosleep@"$OBJECT"  2>&1 | tee -a /var/log/libvirt/custom_hooks.log
+                /bin/vfio-startup.sh 2>&1 | tee -a /var/log/libvirt/custom_hooks.log
+                ;;
+
+        "release")
+		systemctl set-property --runtime -- system.slice AllowedCPUs=0-19
+		systemctl set-property --runtime -- user.slice AllowedCPUs=0-19
+		systemctl set-property --runtime -- init.scope AllowedCPUs=0-19	
+                systemctl stop libvirt-nosleep@"$OBJECT"  2>&1 | tee -a /var/log/libvirt/custom_hooks.log  
+                /bin/vfio-teardown.sh 2>&1 | tee -a /var/log/libvirt/custom_hooks.log
+                ;;
+	esac
+fi
+
+

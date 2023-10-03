@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sleep 45
 
 if [[ $(sudo virsh list --all | grep running) ]]; then
   echo "VM running, performing action"

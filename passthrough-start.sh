@@ -61,9 +61,6 @@ then
 	exit 0
 fi
 
-# Create network bridge
-./create_bridge.sh
-
 # CPU governor settings (keep CPU frequency up, might not work on older CPUs - use cpupower for those)
 pstate-frequency --set -p max
 
@@ -118,6 +115,7 @@ for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
 sysctl vm.stat_interval=120
 sysctl -w kernel.watchdog=0
 
+
 # Start VM via virt-manager
 echo "VM starting..."
 # Remove existing VM
@@ -125,6 +123,9 @@ virsh undefine --nvram win11
 virsh define win11-working.xml
 virsh start win11
 echo
+
+sleep 20 
+./qemu_fio.sh &
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

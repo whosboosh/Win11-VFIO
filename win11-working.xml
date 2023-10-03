@@ -20,7 +20,24 @@ or other application using the libvirt API.
     <nosharepages/>
     <locked/>
   </memoryBacking>
-  <vcpu placement='static'>16</vcpu>
+  <vcpu placement='static'>12</vcpu>
+  <iothreads>1</iothreads>
+  <cputune>
+    <vcpupin vcpu='0' cpuset='0'/>
+    <vcpupin vcpu='1' cpuset='1'/>
+    <vcpupin vcpu='2' cpuset='2'/>
+    <vcpupin vcpu='3' cpuset='3'/>
+    <vcpupin vcpu='4' cpuset='4'/>
+    <vcpupin vcpu='5' cpuset='5'/>
+    <vcpupin vcpu='6' cpuset='6'/>
+    <vcpupin vcpu='7' cpuset='7'/>
+    <vcpupin vcpu='8' cpuset='8'/>
+    <vcpupin vcpu='9' cpuset='9'/>
+    <vcpupin vcpu='10' cpuset='10'/>
+    <vcpupin vcpu='11' cpuset='11'/>
+    <emulatorpin cpuset='16-19'/>
+    <iothreadpin iothread='1' cpuset='16-19'/>
+  </cputune>
   <sysinfo type='smbios'>
     <bios>
       <entry name='vendor'>American Megatrends International, LLC.</entry>
@@ -53,7 +70,7 @@ or other application using the libvirt API.
     <vmport state='off'/>
   </features>
   <cpu mode='host-passthrough' check='none' migratable='on'>
-    <topology sockets='1' dies='1' cores='8' threads='2'/>
+    <topology sockets='1' dies='1' cores='6' threads='2'/>
   </cpu>
   <clock offset='localtime'>
     <timer name='rtc' tickpolicy='catchup'/>
@@ -214,12 +231,12 @@ or other application using the libvirt API.
     <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'>
       <listen type='address' address='0.0.0.0'/>
     </graphics>
-    <audio id="1" type="jack">
-      <output clientName="win11" connectPorts="USB Audio Speakers"/>
-    </audio>
-    <sound model="ich9">
-      <alias name="sound0"/>
+    <sound model='ich9'>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x1b' function='0x0'/>
     </sound>
+    <audio id='1' type='jack'>
+      <output clientName='win11' connectPorts='USB Audio Speakers'/>
+    </audio>
     <video>
       <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
@@ -300,6 +317,30 @@ or other application using the libvirt API.
       </source>
       <address type='pci' domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
     </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x0'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x01' function='0x0'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x3'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x02' function='0x0'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x4'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x03' function='0x0'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x5'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x04' function='0x0'/>
+    </hostdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='2'/>
     </redirdev>
@@ -312,7 +353,7 @@ or other application using the libvirt API.
     </memballoon>
   </devices>
   <qemu:commandline>
-    <qemu:env name="PIPEWIRE_RUNTIME_DIR" value="/run/user/1000"/>
-    <qemu:env name="PIPEWIRE_LATENCY" value="512/48000"/>
-  </qemu:commandline>  
+    <qemu:env name='PIPEWIRE_RUNTIME_DIR' value='/run/user/1000'/>
+    <qemu:env name='PIPEWIRE_LATENCY' value='512/48000'/>
+  </qemu:commandline>
 </domain>

@@ -1,4 +1,7 @@
 #!/bin/sh
 
+config=$1
+echo $1
+
 virsh undefine --nvram win11
-virsh define win11-working.xml
+virsh define $1

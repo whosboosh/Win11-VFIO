@@ -11,10 +11,6 @@ export TMP_PARAMS="$*"
 # Perform cleanup after shutdown
 cleanup () {
 
-	# Restore screen config (needed to reset main monitor which turns off for whatever reason)
-	#ddcutil --display 1 setvcp 60 3
-	#sudo -u pi -E /usr/share/xrandr-config.sh
-
 	# Return CPU power management to default
 	pstate-frequency --set -p auto -n 50
 
@@ -28,18 +24,6 @@ cleanup () {
 
 	# Kill all background processes
 	killall scream || true
-	#killall synergyc || true
-
-	# Restart polybar on main monitor
-	#pkill polybar
-
-	# Reset cset
-	echo "Resetting cset groups..."
-	#cset shield --reset
-
-	echo "Removing libvirt cgroup slice..."
-	sleep 2
-	#rmdir /sys/fs/cgroup/cpuset/machine.slice
 
 	echo "Undoing kernel optimizations..."
 	echo fff > /sys/devices/virtual/workqueue/cpumask
@@ -48,8 +32,6 @@ cleanup () {
 	sysctl vm.stat_interval=1
         sysctl -w kernel.watchdog=1
 
-	#killall polybar
-	#sudo -u pi -E sh -c "/home/pi/.config/polybar/bar_launch.sh > /dev/null 2>&1 &disown"
 	sleep 2
 }
 
@@ -93,20 +75,6 @@ else
     echo "Hugepages already found, let's use those!"
 fi
 
-# Start Scream receiver for audio over the NAT network
-echo "Starting sound receiver..."
-scream -i br0 &
-
-# Taskset (Move all current processes to unused cores)
-# Done last, so it can move synergy and scream-pulse as well
-#cset shield --kthread on --cpu 1-5,7-11
-#echo "Setting cset groups correctly..."
-#echo 0 > /sys/fs/cgroup/cpuset/system/cpuset.cpu_exclusive
-#echo 0 > /sys/fs/cgroup/cpuset/user/cpuset.cpu_exclusive
-
-#echo 0 > /sys/fs/cgroup/cpuset/machine.slice/cpuset.cpu_exclusive
-#echo 0-11 > /sys/fs/cgroup/cpuset/machine.slice/cpuset.cpus
-
 echo "Performing minor optimizations prior to launch..."
 echo 041 > /sys/devices/virtual/workqueue/cpumask
 echo -1 > /proc/sys/kernel/sched_rt_runtime_us
@@ -115,17 +83,19 @@ for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
 sysctl vm.stat_interval=120
 sysctl -w kernel.watchdog=0
 
-
 # Start VM via virt-manager
 echo "VM starting..."
 # Remove existing VM
 virsh undefine --nvram win11
-virsh define win11-working.xml
+virsh define win11-working-lookingglass.xml
 virsh start win11
 echo
 
-sleep 20 
-./qemu_fio.sh &
+echo "Starting looking glass client"
+sudo -u nate looking-glass-client -f /dev/shm/looking-glass &
+
+sleep 20
+./qemu_fifo.sh &
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

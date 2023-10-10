@@ -1,18 +1,22 @@
-# Win10-VFIO
-Collection of scripts and tweaks for making a Windows 10 virtual machine run with QEMU/KVM/libvirt with GPU passthrough.
+# Win11-VFIO
+Collection of scripts and tweaks for making a Windows 11 virtual machine run with QEMU/KVM/libvirt with GPU passthrough.
+Thanks to @Pimaker for the original configuration
 
 System details at time of writing:
-* Intel i7 8700k @ 4.8GHz
+* Intel i7 12700KF
 * 32 GB RAM
+* 2080 for Guest, 1660S for Host
+* Fedora host machine
 
-Runs fast enough for demanding VR titles :)
+Made for VR Gaming, DJ'ing
+
+For Single GPU passthrough there are some scripts at `hooks` which you can use to disable the display manager and unload graphics driver kernel modules. These are DE/WM/GPU vendor agnostic so they should detect various configurations. Inside the hook there is also some pinning I use for my CPU to move the Host machine to use the little cores and the guest uses all the performance cores.
 
 # Additional information
-* Q35, PCIe configuration, physical SATA SSD given to the guest via SCSI passthrough (virtio)
-* Network "winbr0" created using nmcli on the host
-* Kernel parameters: `intel_iommu=on iommu=pt transparent_hugepage=never nmi_watchdog=0 intremap=no_x2apic_optout rcu_nocbs=1-5,7-11 nohz_full=1-5,7-11 clocksource=tsc clock=tsc force_tsc_stable=1 vfio-pci.ids=10de:1b06,10de:10ef,8086:3e92 vfio-pci.disable_vga=1 module_blacklist=i915,nouveau pcie_acs_override=downstream efifb=off video=efifb:off`
-* Using a custom-built mainline linux (latest rc, if available) with `CONFIG_PREEMPT_VOLUNTARY=y` (fixes long boot time with UEFI guests), default tickrate, ZFS, WireGuard and some ClearLinux patches
-* Latest Arch Linux qemu-headless
-* Host is using an AMD RX 550, the guest an NVIDIA 2080 Ti
-* USB via passed through USB3 on-board controller, the alternative "3.1" controller on my mainboard is left for the host (switching mouse/keyboard via physical USB switch, although I've had successes with evdev as well)
-* Audio works via [Scream](https://github.com/duncanthrax/scream) (using IVSHMEM for best latency)
+* Network "br0" created using nmcli on the host
+* Kernel parameters: `rd.driver.blacklist=nouveau modprobe.blacklist=nouveau nvidia-drm.modeset=0 rhgb intel_iommu=on iommu=pt resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 vfio-pci.ids=10de:1e87,10de:10f8,10de:1ad8,10de:1ad9 vfio-pci.disable_vga=1 pcie_acs_override=downstream efifb=off video=efifb:off`
+* Host is using an GTX 1660S, the guest an NVIDIA 2080
+* USB via passed through via a PCIE USB card, Mouse/Keyboard use SPICE with Looking glass
+* Audio works via [Scream](https://github.com/duncanthrax/scream) (using LAN)
+* x11vnc is used to VNC back to Host from Guest
+* Looking glass is used to interact with the guest (https://looking-glass.io/)

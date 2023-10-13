@@ -294,18 +294,34 @@ or other application using the libvirt API.
       <source>
         <address domain='0x0000' bus='0x07' slot='0x00' function='0x3'/>
       </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
         <address domain='0x0000' bus='0x07' slot='0x00' function='0x2'/>
       </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
     </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x1b1c'/>
+        <product id='0x0c0b'/>
+      </source>
+      <address type='usb' bus='0' port='1'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x1b1c'/>
+        <product id='0x0c09'/>
+      </source>
+      <address type='usb' bus='0' port='4'/>
+    </hostdev>    
     <channel type="spicevmc">
       <target type="virtio" name="com.redhat.spice.0"/>
       <address type="virtio-serial" controller="0" bus="0" port="1"/>
-    </channel>    
+    </channel>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='2'/>
     </redirdev>

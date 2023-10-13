@@ -91,11 +91,7 @@ virsh define win11-working-lookingglass.xml
 virsh start win11
 echo
 
-echo "Starting looking glass client"
-sudo -u nate looking-glass-client -f /dev/shm/looking-glass &
-
-sleep 20
-./qemu_fifo.sh &
+#./qemu_fifo.sh &
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

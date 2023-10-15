@@ -47,7 +47,7 @@ fi
 pstate-frequency --set -p max
 
 # Hugepages config
-export HUGEPAGES=11000
+export HUGEPAGES=9000
 
 # Note that allocating hugepages after boot has a chance to fail. If continuous memory
 # cannot be allocated, a reboot will be required.

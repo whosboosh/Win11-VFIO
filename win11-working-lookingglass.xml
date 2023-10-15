@@ -22,21 +22,25 @@ or other application using the libvirt API.
     <source type='memfd'/>
     <access mode='shared'/>	    
   </memoryBacking>
-  <vcpu placement='static'>12</vcpu>
+  <vcpu placement='static'>16</vcpu>
   <iothreads>1</iothreads>
   <cputune>
-    <vcpupin vcpu='0' cpuset='0'/>
-    <vcpupin vcpu='1' cpuset='1'/>
-    <vcpupin vcpu='2' cpuset='2'/>
-    <vcpupin vcpu='3' cpuset='3'/>
-    <vcpupin vcpu='4' cpuset='4'/>
-    <vcpupin vcpu='5' cpuset='5'/>
-    <vcpupin vcpu='6' cpuset='6'/>
-    <vcpupin vcpu='7' cpuset='7'/>
-    <vcpupin vcpu='8' cpuset='8'/>
-    <vcpupin vcpu='9' cpuset='9'/>
-    <vcpupin vcpu='10' cpuset='10'/>
-    <vcpupin vcpu='11' cpuset='11'/>
+    <vcpupin vcpu="0" cpuset="0"/>
+    <vcpupin vcpu="1" cpuset="1"/>
+    <vcpupin vcpu="2" cpuset="2"/>
+    <vcpupin vcpu="3" cpuset="3"/>
+    <vcpupin vcpu="4" cpuset="4"/>
+    <vcpupin vcpu="5" cpuset="5"/>
+    <vcpupin vcpu="6" cpuset="6"/>
+    <vcpupin vcpu="7" cpuset="7"/>
+    <vcpupin vcpu="8" cpuset="8"/>
+    <vcpupin vcpu="9" cpuset="9"/>
+    <vcpupin vcpu="10" cpuset="10"/>
+    <vcpupin vcpu="11" cpuset="11"/>
+    <vcpupin vcpu="12" cpuset="12"/>
+    <vcpupin vcpu="13" cpuset="13"/>
+    <vcpupin vcpu="14" cpuset="14"/>
+    <vcpupin vcpu="15" cpuset="15"/>
     <emulatorpin cpuset='16-19'/>
     <iothreadpin iothread='1' cpuset='16-19'/>
   </cputune>
@@ -72,7 +76,7 @@ or other application using the libvirt API.
     <vmport state='off'/>
   </features>
   <cpu mode='host-passthrough' check='none' migratable='on'>
-    <topology sockets='1' dies='1' cores='6' threads='2'/>
+    <topology sockets='1' dies='1' cores='8' threads='2'/>
   </cpu>
   <clock offset='localtime'>
     <timer name='rtc' tickpolicy='catchup'/>
@@ -235,9 +239,7 @@ or other application using the libvirt API.
   		<listen type="address"/>
   		<image compression="off"/>
 		</graphics>		
-    <sound model='ich9'>
-      <audio id='1'/>
-    </sound>
+    <audio id="1" type="none"/>
     <hostdev mode='subsystem' type='usb' managed='yes'>
       <source>
         <vendor id='0x28de'/>
@@ -333,8 +335,4 @@ or other application using the libvirt API.
       <size unit='M'>256</size>
     </shmem>    
   </devices>
-  <qemu:commandline>
-    <qemu:env name='PIPEWIRE_RUNTIME_DIR' value='/run/user/1000'/>
-    <qemu:env name='PIPEWIRE_LATENCY' value='512/48000'/>
-  </qemu:commandline>
 </domain>

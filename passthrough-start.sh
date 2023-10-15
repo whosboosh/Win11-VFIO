@@ -93,7 +93,7 @@ echo
 
 #./qemu_fifo.sh &
 
-sudo -u nate ./start-lookingglass.sh
+sudo -u nate ./start-lookingglass.sh &
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

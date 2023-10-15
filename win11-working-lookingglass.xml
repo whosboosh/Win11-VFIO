@@ -229,6 +229,8 @@ or other application using the libvirt API.
     <input type='evdev'>
       <source dev='/dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd' grab='all' repeat='on' grabToggle='ctrl-ctrl'/>
     </input>
+		<input type='mouse' bus='virtio'/>
+		<input type='keyboard' bus='virtio'/>
     <tpm model='tpm-tis'>
       <backend type='emulator' version='2.0'/>
     </tpm>

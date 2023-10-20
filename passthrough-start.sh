@@ -7,6 +7,7 @@ fi
 
 # Necessary for parameter usage in cleanup()
 export TMP_PARAMS="$*"
+TMP_PARMS+="--keep-hugepages"
 
 # Perform cleanup after shutdown
 cleanup () {

@@ -224,7 +224,7 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x09' slot='0x00' function='0x0'/>
     </interface>
     <input type='evdev'>
-      <source dev='/dev/input/by-id/usb-Logitech_G_Pro_Wireless_Gaming_Mouse_49F329C12F9C6DC3-event-mouse'/>
+      <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
     </input>
     <input type='evdev'>
       <source dev='/dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd' grab='all' repeat='on' grabToggle='ctrl-ctrl'/>
@@ -305,13 +305,6 @@ or other application using the libvirt API.
       </source>
       <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x1b1c'/>
-        <product id='0x0c0b'/>
-      </source>
-      <address type='usb' bus='0' port='1'/>
     </hostdev>
     <hostdev mode='subsystem' type='usb' managed='yes'>
       <source>

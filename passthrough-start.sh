@@ -7,13 +7,15 @@ fi
 
 # Necessary for parameter usage in cleanup()
 export TMP_PARAMS="$*"
-TMP_PARMS+="--keep-hugepages"
+TMP_PARAMS+=" --keep-hugepages "
 
 # Perform cleanup after shutdown
 cleanup () {
 
 	# Return CPU power management to default
 	pstate-frequency --set -p auto -n 50
+
+	echo $TMP_PARAMS
 
 	if [[ $TMP_PARAMS == *'--keep-hugepages'* ]]
 	then

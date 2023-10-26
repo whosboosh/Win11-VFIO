@@ -94,7 +94,6 @@ virsh define win11-working-lookingglass.xml
 virsh start win11
 echo
 
-
 sudo -u nate ./start-lookingglass.sh &
 
 # Print status and wait for exit

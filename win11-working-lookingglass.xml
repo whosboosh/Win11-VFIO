@@ -5,7 +5,7 @@ OVERWRITTEN AND LOST. Changes to this xml configuration should be made using:
 or other application using the libvirt API.
 -->
 
-<domain type='kvm'>
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
   <name>win11</name>
   <uuid>ebef7cd8-a8ce-5311-a4b1-d8bbc18eb062</uuid>
   <metadata>
@@ -306,12 +306,14 @@ or other application using the libvirt API.
       <source>
         <address domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
       </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
         <address domain='0x0000' bus='0x06' slot='0x00' function='0x1'/>
       </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
     </hostdev>
     <redirdev bus='usb' type='spicevmc'>
@@ -328,4 +330,8 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x10' slot='0x01' function='0x0'/>
     </shmem>
   </devices>
+  <qemu:commandline>
+    <qemu:arg value='-fw_cfg'/>
+    <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
+  </qemu:commandline>
 </domain>

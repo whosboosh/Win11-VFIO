@@ -25,9 +25,6 @@ cleanup () {
 		echo "0" > /proc/sys/vm/nr_hugepages
 	fi
 
-	# Kill all background processes
-	killall scream || true
-
 	echo "Undoing kernel optimizations..."
 	echo fff > /sys/devices/virtual/workqueue/cpumask
 	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
@@ -36,6 +33,7 @@ cleanup () {
         sysctl -w kernel.watchdog=1
 
 	sleep 2
+	./qemu_fifo.sh --cleanup
 }
 
 
@@ -94,7 +92,11 @@ virsh define win11-working-lookingglass.xml
 virsh start win11
 echo
 
+# Start looking glass
 sudo -u nate ./start-lookingglass.sh &
+
+sleep 25
+./qemu_fifo.sh
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

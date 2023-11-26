@@ -298,6 +298,38 @@ or other application using the libvirt API.
       <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
     </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x28de'/>
+        <product id='0x2101'/>
+        <address bus='1' device='10'/>
+      </source>
+      <address type='usb' bus='0' port='1'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x28de'/>
+        <product id='0x2101'/>
+        <address bus='1' device='9'/>
+      </source>
+      <address type='usb' bus='0' port='5'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x28de'/>
+        <product id='0x2101'/>
+        <address bus='1' device='5'/>
+      </source>
+      <address type='usb' bus='0' port='6'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='usb' managed='yes'>
+      <source>
+        <vendor id='0x28de'/>
+        <product id='0x2101'/>
+        <address bus='1' device='7'/>
+      </source>
+      <address type='usb' bus='0' port='7'/>
+    </hostdev>		
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='2'/>
     </redirdev>

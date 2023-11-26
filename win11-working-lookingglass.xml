@@ -298,41 +298,45 @@ or other application using the libvirt API.
       <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
     </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
+    <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='10'/>
+        <vendor id="0x28de"/>
+        <product id="0x2101"/>
+        <address bus="3" device="8"/>
       </source>
-      <address type='usb' bus='0' port='1'/>
+      <address type="usb" bus="0" port="1"/>
     </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
+    <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='9'/>
+        <vendor id="0x28de"/>
+        <product id="0x2101"/>
+        <address bus="3" device="7"/>
       </source>
-      <address type='usb' bus='0' port='5'/>
+      <address type="usb" bus="0" port="5"/>
     </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
+    <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='5'/>
+        <vendor id="0x28de"/>
+        <product id="0x2101"/>
+        <address bus="3" device="6"/>
       </source>
-      <address type='usb' bus='0' port='6'/>
+      <address type="usb" bus="0" port="6"/>
     </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
+    <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='7'/>
+        <vendor id="0x28de"/>
+        <product id="0x2101"/>
+        <address bus="3" device="5"/>
       </source>
-      <address type='usb' bus='0' port='7'/>
+      <address type="usb" bus="0" port="7"/>
+    </hostdev>
+    <hostdev mode="subsystem" type="usb" managed="yes">
+      <source>
+        <vendor id="0x8087"/>
+        <product id="0x0026"/>
+      </source>
+      <address type="usb" bus="0" port="2"/>
     </hostdev>		
-    <redirdev bus='usb' type='spicevmc'>
-      <address type='usb' bus='0' port='2'/>
-    </redirdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>
@@ -348,4 +352,7 @@ or other application using the libvirt API.
     <qemu:arg value='-fw_cfg'/>
     <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
   </qemu:commandline>
+  <qemu:capabilities>
+    <qemu:del capability="usb-host.hostdevice"/>
+  </qemu:capabilities>	
 </domain>

@@ -90,6 +90,7 @@ or other application using the libvirt API.
     <topology sockets='1' dies='1' cores='8' threads='2'/>
 		<feature policy='require' name='invtsc'/>
 		<feature policy='require' name='hypervisor'/>
+		<feature policy='require' name='vmx'/>
 		<cache mode='passthrough'/>
   </cpu>
   <clock offset="localtime">
@@ -107,12 +108,14 @@ or other application using the libvirt API.
   </pm>
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/nvme-CT2000P3PSSD8_2331E864D1A4'/>
-      <target dev='sda' bus='sata'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
-    </disk>
+  <disk type="file" device="disk">
+    <driver name="qemu" type="qcow2"/>
+    <source file="/mnt/qemu/vm.qcow2" index="1"/>
+    <backingStore/>
+    <target dev="sdg" bus="sata"/>
+    <alias name="sata1-0-0"/>
+    <address type="drive" controller="1" bus="0" target="0" unit="0"/>
+  </disk>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
@@ -130,12 +133,6 @@ or other application using the libvirt API.
       <source dev='/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A'/>
       <target dev='sdd' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='3'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N848255W_1-part3'/>
-      <target dev='sde' bus='sata'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='4'/>
     </disk>
     <controller type='usb' index='0' model='qemu-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -232,6 +229,12 @@ or other application using the libvirt API.
       <target dir='mount_tag'/>
       <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
     </filesystem>
+    <filesystem type="mount" accessmode="passthrough">
+      <driver type="virtiofs" queue='1024'/>
+      <source dir="/mnt2"/>
+      <target dir="mount_tag2"/>
+      <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
+    </filesystem>
     <interface type='bridge'>
       <mac address='52:54:00:90:46:ff'/>
       <source bridge='br0'/>
@@ -300,9 +303,15 @@ or other application using the libvirt API.
     </hostdev>
     <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id="0x28de"/>
-        <product id="0x2101"/>
-        <address bus="3" device="8"/>
+        <vendor id="0x8087"/>
+        <product id="0x0026"/>
+      </source>
+      <address type="usb" bus="0" port="2"/>
+    </hostdev>
+    <hostdev mode="subsystem" type="usb" managed="yes">
+      <source>
+        <vendor id="0x0781"/>
+        <product id="0x55a3"/>
       </source>
       <address type="usb" bus="0" port="1"/>
     </hostdev>
@@ -310,7 +319,7 @@ or other application using the libvirt API.
       <source>
         <vendor id="0x28de"/>
         <product id="0x2101"/>
-        <address bus="3" device="7"/>
+        <address bus="1" device="5"/>
       </source>
       <address type="usb" bus="0" port="5"/>
     </hostdev>
@@ -318,7 +327,7 @@ or other application using the libvirt API.
       <source>
         <vendor id="0x28de"/>
         <product id="0x2101"/>
-        <address bus="3" device="6"/>
+        <address bus="1" device="7"/>
       </source>
       <address type="usb" bus="0" port="6"/>
     </hostdev>
@@ -326,17 +335,18 @@ or other application using the libvirt API.
       <source>
         <vendor id="0x28de"/>
         <product id="0x2101"/>
-        <address bus="3" device="5"/>
+        <address bus="1" device="9"/>
       </source>
       <address type="usb" bus="0" port="7"/>
     </hostdev>
     <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <vendor id="0x8087"/>
-        <product id="0x0026"/>
+        <vendor id="0x28de"/>
+        <product id="0x2101"/>
+        <address bus="1" device="10"/>
       </source>
-      <address type="usb" bus="0" port="2"/>
-    </hostdev>		
+      <address type="usb" bus="0" port="8"/>
+    </hostdev>    
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>

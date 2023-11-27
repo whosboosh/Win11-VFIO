@@ -96,7 +96,7 @@ echo
 sudo -u nate ./start-lookingglass.sh &
 
 sleep 25
-./qemu_fifo.sh
+#./qemu_fifo.sh
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

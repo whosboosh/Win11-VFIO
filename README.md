@@ -5,8 +5,8 @@ Thanks to @Pimaker for the original configuration
 System details at time of writing:
 * Intel i7 12700KF
 * 32 GB RAM
-* 2080 for Guest, 1660S for Host
-* Fedora host machine
+* RTX 3090 for Guest, AMD RX 570 for Host
+* Fedora host OS
 
 Made for VR Gaming, DJ'ing
 
@@ -21,9 +21,9 @@ nodes_path=/proc/sys/vm/nr_hugepages
 reserve_pages()
 {
     # Drop caches and compact memory to free up continuous memory for huge pages
-	echo 3 > /proc/sys/vm/drop_caches
+    echo 3 > /proc/sys/vm/drop_caches
     echo 1 > /proc/sys/vm/compact_memory
-	echo $1 > $nodes_path
+    echo $1 > $nodes_path
 }
 
 reserve_pages 9000
@@ -31,7 +31,7 @@ reserve_pages 9000
 
 # Additional information
 * Network "br0" created using nmcli on the host
-* Kernel parameters: `vfio-pci.ids=10de:1e87,10de:10f8,10de:1ad8,10de:1ad9 vfio-pci.disable_vga=1 pcie_acs_override=downstream efifb=off video=efifb:off modprobe.blacklist=nouveau rd.driver.blacklist=nouveau nvidia-drm.modeset=0 rhgb intel_iommu=on iommu=pt resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 default_hugepagesz=16G hugepagesz=16G`
+* Kernel parameters: `vfio-pci.ids=10de:2204,10de,1aef rhgb intel_iommu=on iommu=pt resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 default_hugepagesz=16G hugepagesz=16G preempt=voluntary`
 * Host is using an GTX 1660S, the guest an NVIDIA 2080
 * USB via passed through via a PCIE USB card, Mouse/Keyboard use SPICE with Looking glass
 * Audio works via [Scream](https://github.com/duncanthrax/scream) (using LAN)

@@ -32,7 +32,6 @@ reserve_pages 9000
 # Additional information
 * Network "br0" created using nmcli on the host
 * Kernel parameters: `vfio-pci.ids=10de:2204,10de,1aef rhgb intel_iommu=on iommu=pt resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 default_hugepagesz=16G hugepagesz=16G preempt=voluntary`
-* Host is using an GTX 1660S, the guest an NVIDIA 2080
 * USB via passed through via a PCIE USB card, Mouse/Keyboard use SPICE with Looking glass
 * Audio works via [Scream](https://github.com/duncanthrax/scream) (using LAN)
 * x11vnc is used to VNC back to Host from Guest

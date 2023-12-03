@@ -13,16 +13,16 @@ or other application using the libvirt API.
       <libosinfo:os id="http://microsoft.com/win/11"/>
     </libosinfo:libosinfo>
   </metadata>
-  <memory unit='KiB'>22528000</memory>
-  <currentMemory unit='KiB'>22528000</currentMemory>
+  <memory unit='KiB'>16777216</memory>
+  <currentMemory unit='KiB'>16777216</currentMemory>
   <memoryBacking>
     <hugepages/>
     <nosharepages/>
     <locked/>
     <source type='memfd'/>
-    <access mode='shared'/>		
+    <access mode='shared'/>
   </memoryBacking>
-  <vcpu placement='static'>12</vcpu>
+  <vcpu placement='static'>16</vcpu>
   <iothreads>1</iothreads>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
@@ -37,6 +37,10 @@ or other application using the libvirt API.
     <vcpupin vcpu='9' cpuset='9'/>
     <vcpupin vcpu='10' cpuset='10'/>
     <vcpupin vcpu='11' cpuset='11'/>
+    <vcpupin vcpu='12' cpuset='12'/>
+    <vcpupin vcpu='13' cpuset='13'/>
+    <vcpupin vcpu='14' cpuset='14'/>
+    <vcpupin vcpu='15' cpuset='15'/>
     <emulatorpin cpuset='16-19'/>
     <iothreadpin iothread='1' cpuset='16-19'/>
   </cputune>
@@ -57,7 +61,7 @@ or other application using the libvirt API.
     </system>
   </sysinfo>
   <os>
-    <type arch='x86_64' machine='pc-q35-3.0'>hvm</type>
+    <type arch='x86_64' machine='pc-q35-7.0'>hvm</type>
     <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
     <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
     <boot dev='hd'/>
@@ -67,12 +71,27 @@ or other application using the libvirt API.
   <features>
     <acpi/>
     <apic/>
-    <hyperv mode='passthrough'>
+    <hyperv mode='custom'>
+      <relaxed state='on'/>
+      <vapic state='on'/>
+      <spinlocks state='on' retries='8191'/>
+      <vpindex state='on'/>
+      <synic state='on'/>
+      <stimer state='on'/>
+      <reset state='on'/>
+      <vendor_id state='on' value='0123756792CD'/>
     </hyperv>
+    <kvm>
+      <hidden state='on'/>
+    </kvm>
     <vmport state='off'/>
   </features>
   <cpu mode='host-passthrough' check='none' migratable='on'>
     <topology sockets='1' dies='1' cores='8' threads='2'/>
+    <cache mode='passthrough'/>
+    <feature policy='require' name='invtsc'/>
+    <feature policy='require' name='hypervisor'/>
+    <feature policy='require' name='vmx'/>
   </cpu>
   <clock offset='localtime'>
     <timer name='rtc' tickpolicy='catchup'/>
@@ -89,17 +108,6 @@ or other application using the libvirt API.
   </pm>
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
-		<filesystem type='mount' accessmode='passthrough'>
-      <driver type='virtiofs' queue='1024'/>
-      <source dir='/home/nate/Music/RedSea'/>
-      <target dir='mount_tag'/>
-    </filesystem>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/nvme-CT2000P3PSSD8_2331E864D1A4'/>
-      <target dev='sda' bus='sata'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='0'/>
-    </disk>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
@@ -117,8 +125,15 @@ or other application using the libvirt API.
       <source dev='/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A'/>
       <target dev='sdd' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='3'/>
-    </disk>		
-    <controller type='usb' index='0' model='qemu-xhci' ports='15'>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/mnt/qemu/vm.qcow2'/>
+      <backingStore/>
+      <target dev='sdg' bus='sata'/>
+      <address type='drive' controller='1' bus='0' target='0' unit='0'/>
+    </disk>
+    <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
     <controller type='pci' index='0' model='pcie-root'/>
@@ -204,134 +219,127 @@ or other application using the libvirt API.
     <controller type='sata' index='0'>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x1f' function='0x2'/>
     </controller>
+    <controller type='sata' index='1'>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x02' function='0x0'/>
+    </controller>
     <controller type='virtio-serial' index='0'>
       <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
     </controller>
+    <filesystem type='mount' accessmode='passthrough'>
+      <driver type='virtiofs' queue='1024'/>
+      <source dir='/home/nate/Music/RedSea'/>
+      <target dir='mount_tag'/>
+      <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+    </filesystem>
+    <filesystem type='mount' accessmode='passthrough'>
+      <driver type='virtiofs' queue='1024'/>
+      <source dir='/mnt2'/>
+      <target dir='mount_tag2'/>
+      <address type='pci' domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
+    </filesystem>
     <interface type='bridge'>
       <mac address='52:54:00:90:46:ff'/>
       <source bridge='br0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x09' slot='0x00' function='0x0'/>
     </interface>
-    <interface type='network'>
-      <mac address='52:54:00:54:58:be'/>
-      <source network='network'/>
-      <model type='virtio'/>
+    <channel type='spicevmc'>
+      <target type='virtio' name='com.redhat.spice.0'/>
+      <address type='virtio-serial' controller='0' bus='0' port='1'/>
+    </channel>
+    <input type='mouse' bus='virtio'>
       <address type='pci' domain='0x0000' bus='0x0a' slot='0x00' function='0x0'/>
-    </interface>    
+    </input>
+    <input type='keyboard' bus='virtio'>
+      <address type='pci' domain='0x0000' bus='0x0c' slot='0x00' function='0x0'/>
+    </input>
     <input type='mouse' bus='ps2'/>
     <input type='keyboard' bus='ps2'/>
     <tpm model='tpm-tis'>
       <backend type='emulator' version='2.0'/>
     </tpm>
-    <graphics type='spice'>
-      <listen type='none'/>
+    <graphics type='spice' autoport='yes'>
+      <listen type='address'/>
       <image compression='off'/>
-      <gl enable='no'/>
     </graphics>
-    <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'>
-      <listen type='address' address='0.0.0.0'/>
-    </graphics>
-    <video>
-      <model type='qxl' ram='65536' vram='65536' vgamem='16384' heads='1' primary='yes'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0'/>
-    </video>
     <sound model='ich9'>
       <audio id='1'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x1b' function='0x0'/>
     </sound>
-    <audio id='1' type='spice'/>		
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='5'/>
-      </source>
-      <address type='usb' bus='0' port='5'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='7'/>
-      </source>
-      <address type='usb' bus='0' port='9'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='9'/>
-      </source>
-      <address type='usb' bus='0' port='6'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x28de'/>
-        <product id='0x2101'/>
-        <address bus='1' device='8'/>
-      </source>
-      <address type='usb' bus='0' port='7'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x30be'/>
-        <product id='0x0100'/>
-      </source>
-      <address type='usb' bus='0' port='8'/>
-    </hostdev>		
+    <audio id='1' type='spice'/>
+    <video>
+      <model type='none'/>
+    </video>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+        <address domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
       </source>
+      <address type='pci' domain='0x0000' bus='0x0d' slot='0x00' function='0x0'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
+      </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+        <address domain='0x0000' bus='0x06' slot='0x00' function='0x1'/>
       </source>
+      <rom bar='off'/>
       <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x3'/>
       </source>
-      <address type='pci' domain='0x0000' bus='0x06' slot='0x00' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x0c45'/>
-        <product id='0x652f'/>
-      </source>
-      <address type='usb' bus='0' port='1'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='usb' managed='yes'>
-      <source>
-        <vendor id='0x046d'/>
-        <product id='0xc539'/>
-      </source>
-      <address type='usb' bus='0' port='4'/>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x03' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x07' slot='0x00' function='0x3'/>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x4'/>
       </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x04' function='0x0'/>
     </hostdev>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <source>
-        <address domain='0x0000' bus='0x07' slot='0x00' function='0x2'/>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x5'/>
       </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x05' function='0x0'/>
     </hostdev>
-    <redirdev bus='usb' type='spicevmc'>
-      <address type='usb' bus='0' port='2'/>
-    </redirdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x1f' function='0x0'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x06' function='0x0'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x00' slot='0x14' function='0x0'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x07' function='0x0'/>
+    </hostdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>
     <watchdog model='itco' action='reset'/>
-    <memballoon model="none"/>
+    <memballoon model='none'/>
+    <shmem name='looking-glass'>
+      <model type='ivshmem-plain'/>
+      <size unit='M'>256</size>
+      <address type='pci' domain='0x0000' bus='0x10' slot='0x01' function='0x0'/>
+    </shmem>
   </devices>
+  <qemu:commandline>
+    <qemu:arg value='-fw_cfg'/>
+    <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
+    <qemu:arg value='-chardev'/>
+    <qemu:arg value='socket,id=mon1,server=on,wait=off,path=/tmp/qmp-sock'/>
+    <qemu:arg value='-mon'/>
+    <qemu:arg value='chardev=mon1,mode=control,pretty=on'/>
+  </qemu:commandline>
+  <qemu:capabilities>
+    <qemu:del capability='usb-host.hostdevice'/>
+  </qemu:capabilities>
 </domain>

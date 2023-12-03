@@ -22,7 +22,7 @@ or other application using the libvirt API.
     <source type='memfd'/>
     <access mode='shared'/>
   </memoryBacking>
-  <vcpu placement="static">16</vcpu>
+  <vcpu placement="static">12</vcpu>
   <iothreads>1</iothreads>
   <cputune>
     <vcpupin vcpu="0" cpuset="0"/>
@@ -37,13 +37,9 @@ or other application using the libvirt API.
     <vcpupin vcpu="9" cpuset="9"/>
     <vcpupin vcpu="10" cpuset="10"/>
     <vcpupin vcpu="11" cpuset="11"/>
-    <vcpupin vcpu="12" cpuset="12"/>
-    <vcpupin vcpu="13" cpuset="13"/>
-    <vcpupin vcpu="14" cpuset="14"/>
-    <vcpupin vcpu="15" cpuset="15"/>
-    <emulatorpin cpuset='16-19'/>
-    <iothreadpin iothread='1' cpuset='16-19'/>	
-  </cputune>	
+    <emulatorpin cpuset='12-19'/>
+    <iothreadpin iothread='1' cpuset='12-19'/>
+  </cputune>
   <sysinfo type='smbios'>
     <bios>
       <entry name='vendor'>American Megatrends International, LLC.</entry>
@@ -83,11 +79,11 @@ or other application using the libvirt API.
     </hyperv>
     <vmport state='off'/>
     <kvm>
-        <hidden state="on"/>
-    </kvm>		
+      <hidden state="on"/>
+    </kvm>
   </features>
   <cpu mode='host-passthrough' check='none' migratable="on">
-    <topology sockets='1' dies='1' cores='8' threads='2'/>
+    <topology sockets='1' dies='1' cores='6' threads='2'/>
 		<feature policy='require' name='invtsc'/>
 		<feature policy='require' name='hypervisor'/>
 		<feature policy='require' name='vmx'/>
@@ -98,7 +94,7 @@ or other application using the libvirt API.
     <timer name="pit" tickpolicy="delay"/>
     <timer name="hpet" present="no"/>
     <timer name="hypervclock" present="yes"/>
-  </clock>	
+  </clock>
   <on_poweroff>destroy</on_poweroff>
   <on_reboot>restart</on_reboot>
   <on_crash>destroy</on_crash>
@@ -134,7 +130,7 @@ or other application using the libvirt API.
       <target dev='sdd' bus='sata'/>
       <address type='drive' controller='0' bus='0' target='0' unit='3'/>
     </disk>
-    <controller type='usb' index='0' model='qemu-xhci' ports='15'>
+    <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
     <controller type='pci' index='0' model='pcie-root'/>
@@ -308,45 +304,6 @@ or other application using the libvirt API.
       </source>
       <address type="usb" bus="0" port="2"/>
     </hostdev>
-    <hostdev mode="subsystem" type="usb" managed="yes">
-      <source>
-        <vendor id="0x0781"/>
-        <product id="0x55a3"/>
-      </source>
-      <address type="usb" bus="0" port="1"/>
-    </hostdev>
-    <hostdev mode="subsystem" type="usb" managed="yes">
-      <source>
-        <vendor id="0x28de"/>
-        <product id="0x2101"/>
-        <address bus="1" device="5"/>
-      </source>
-      <address type="usb" bus="0" port="5"/>
-    </hostdev>
-    <hostdev mode="subsystem" type="usb" managed="yes">
-      <source>
-        <vendor id="0x28de"/>
-        <product id="0x2101"/>
-        <address bus="1" device="7"/>
-      </source>
-      <address type="usb" bus="0" port="6"/>
-    </hostdev>
-    <hostdev mode="subsystem" type="usb" managed="yes">
-      <source>
-        <vendor id="0x28de"/>
-        <product id="0x2101"/>
-        <address bus="1" device="9"/>
-      </source>
-      <address type="usb" bus="0" port="7"/>
-    </hostdev>
-    <hostdev mode="subsystem" type="usb" managed="yes">
-      <source>
-        <vendor id="0x28de"/>
-        <product id="0x2101"/>
-        <address bus="1" device="10"/>
-      </source>
-      <address type="usb" bus="0" port="8"/>
-    </hostdev>    
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>
@@ -361,8 +318,12 @@ or other application using the libvirt API.
   <qemu:commandline>
     <qemu:arg value='-fw_cfg'/>
     <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
+    <qemu:arg value="-chardev"/>
+    <qemu:arg value="socket,id=mon1,server=on,wait=off,path=/tmp/qmp-sock"/>
+    <qemu:arg value="-mon"/>
+    <qemu:arg value="chardev=mon1,mode=control,pretty=on"/>
   </qemu:commandline>
   <qemu:capabilities>
     <qemu:del capability="usb-host.hostdevice"/>
-  </qemu:capabilities>	
+  </qemu:capabilities>
 </domain>

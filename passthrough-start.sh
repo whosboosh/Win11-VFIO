@@ -77,12 +77,12 @@ else
 fi
 
 echo "Performing minor optimizations prior to launch..."
-echo 041 > /sys/devices/virtual/workqueue/cpumask
-echo -1 > /proc/sys/kernel/sched_rt_runtime_us
-for i in $(pgrep '^rcuo'); do taskset -pc 0,6 $i > /dev/null; done;
-for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
-sysctl vm.stat_interval=120
-sysctl -w kernel.watchdog=0
+#echo 041 > /sys/devices/virtual/workqueue/cpumask
+#echo -1 > /proc/sys/kernel/sched_rt_runtime_us
+#for i in $(pgrep '^rcuo'); do taskset -pc 0,6 $i > /dev/null; done;
+#for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
+#sysctl vm.stat_interval=120
+#sysctl -w kernel.watchdog=0
 
 # Start VM via virt-manager
 echo "VM starting..."
@@ -95,8 +95,8 @@ echo
 # Start looking glass
 sudo -u nate ./start-lookingglass.sh &
 
-sleep 25
-#./qemu_fifo.sh
+sleep 10
+./qemu_fifo.sh
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

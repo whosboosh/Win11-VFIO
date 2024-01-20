@@ -22,12 +22,8 @@ or other application using the libvirt API.
     <source type='memfd'/>
     <access mode='shared'/>
   </memoryBacking>
-  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
+  <vcpu placement="static">16</vcpu>
   <iothreads>2</iothreads>
-  <iothreadids>
-    <iothread id='1'/>
-    <iothread id='2'/>
-  </iothreadids>
   <cputune>
     <vcpupin vcpu="0" cpuset="0"/>
     <vcpupin vcpu="1" cpuset="16"/>
@@ -45,9 +41,9 @@ or other application using the libvirt API.
     <vcpupin vcpu="13" cpuset="22"/>
     <vcpupin vcpu="14" cpuset="7"/>
     <vcpupin vcpu="15" cpuset="23"/>
-   <emulatorpin cpuset='0,16'/>
-    <iothreadpin iothread='1' cpuset='9,25'/>
-    <iothreadpin iothread='2' cpuset='10,30'/>
+    <emulatorpin cpuset="15,31"/>
+    <iothreadpin iothread="1" cpuset="13,29"/>
+    <iothreadpin iothread="2" cpuset="14,30"/>
     <emulatorsched scheduler="fifo" priority="10"/>
     <vcpusched vcpus="0" scheduler="rr" priority="1"/>
     <vcpusched vcpus="1" scheduler="rr" priority="1"/>
@@ -168,12 +164,6 @@ or other application using the libvirt API.
     <alias name="sata1-0-0"/>
     <address type="drive" controller="1" bus="0" target="0" unit="0"/>
   </disk>
-	<disk type="file" device="disk">
-  <driver name="qemu" type="raw"/>
-  <source file="/mnt/nvme_960_256gb.img"/>
-  <target dev="sdh" bus="sata"/>
-  <address type="drive" controller="1" bus="0" target="0" unit="1"/>
-	</disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
@@ -281,16 +271,16 @@ or other application using the libvirt API.
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x09' slot='0x00' function='0x0'/>
     </interface>
+    <channel type='spicevmc'>
+      <target type='virtio' name='com.redhat.spice.0'/>
+      <address type='virtio-serial' controller='0' bus='0' port='1'/>
+    </channel>
     <input type='evdev'>
       <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
     </input>
     <input type='evdev'>
       <source dev='/dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd' grab='all' grabToggle='ctrl-ctrl' repeat='on'/>
     </input>
-    <channel type='spicevmc'>
-      <target type='virtio' name='com.redhat.spice.0'/>
-      <address type='virtio-serial' controller='0' bus='0' port='1'/>
-    </channel>
     <input type='mouse' bus='virtio'>
       <address type='pci' domain='0x0000' bus='0x0a' slot='0x00' function='0x0'/>
     </input>
@@ -314,31 +304,26 @@ or other application using the libvirt API.
     <video>
       <model type='none'/>
     </video>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x00' slot='0x14' function='0x0'/>
+        <address domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
       </source>
-      <address type='pci' domain='0x0000' bus='0x10' slot='0x03' function='0x0'/>
+      <rom bar="off"/>
+      <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
     </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
-      </source>
-      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+        <address domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
       </source>
       <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
+      <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
     </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x1'/>
+        <address domain="0x0000" bus="0x02" slot="0x00" function="0x1"/>
       </source>
       <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
+      <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
     </hostdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>

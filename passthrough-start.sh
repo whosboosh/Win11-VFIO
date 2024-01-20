@@ -48,7 +48,7 @@ fi
 pstate-frequency --set -p max
 
 # Hugepages config
-export HUGEPAGES=9000
+export HUGEPAGES=11000
 
 # Note that allocating hugepages after boot has a chance to fail. If continuous memory
 # cannot be allocated, a reboot will be required.
@@ -77,12 +77,10 @@ else
 fi
 
 echo "Performing minor optimizations prior to launch..."
-#echo 041 > /sys/devices/virtual/workqueue/cpumask
-#echo -1 > /proc/sys/kernel/sched_rt_runtime_us
-#for i in $(pgrep '^rcuo'); do taskset -pc 0,6 $i > /dev/null; done;
-#for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
-#sysctl vm.stat_interval=120
-#sysctl -w kernel.watchdog=0
+echo 041 > /sys/devices/virtual/workqueue/cpumask
+for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
+sysctl vm.stat_interval=120
+sysctl -w kernel.watchdog=0
 
 # Start VM via virt-manager
 echo "VM starting..."

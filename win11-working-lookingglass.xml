@@ -13,14 +13,15 @@ or other application using the libvirt API.
       <libosinfo:os id="http://microsoft.com/win/11"/>
     </libosinfo:libosinfo>
   </metadata>
-  <memory unit='KiB'>16777216</memory>
-  <currentMemory unit='KiB'>16777216</currentMemory>
+  <memory unit='KiB'>22000000</memory>
+  <currentMemory unit='KiB'>22000000</currentMemory>
   <memoryBacking>
     <hugepages/>
     <nosharepages/>
     <locked/>
-    <source type='memfd'/>
-    <access mode='shared'/>
+    <access mode="private"/>
+    <allocation mode="immediate"/>
+    <discard/>
   </memoryBacking>
   <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
   <iothreads>2</iothreads>
@@ -29,42 +30,25 @@ or other application using the libvirt API.
     <iothread id='2'/>
   </iothreadids>
   <cputune>
-    <vcpupin vcpu="0" cpuset="0"/>
-    <vcpupin vcpu="1" cpuset="16"/>
-    <vcpupin vcpu="2" cpuset="1"/>
-    <vcpupin vcpu="3" cpuset="17"/>
-    <vcpupin vcpu="4" cpuset="2"/>
-    <vcpupin vcpu="5" cpuset="18"/>
-    <vcpupin vcpu="6" cpuset="3"/>
-    <vcpupin vcpu="7" cpuset="19"/>
-    <vcpupin vcpu="8" cpuset="4"/>
-    <vcpupin vcpu="9" cpuset="20"/>
-    <vcpupin vcpu="10" cpuset="5"/>
-    <vcpupin vcpu="11" cpuset="21"/>
-    <vcpupin vcpu="12" cpuset="6"/>
-    <vcpupin vcpu="13" cpuset="22"/>
-    <vcpupin vcpu="14" cpuset="7"/>
-    <vcpupin vcpu="15" cpuset="23"/>
-   <emulatorpin cpuset='0,16'/>
+    <vcpupin vcpu='0' cpuset='0'/>
+    <vcpupin vcpu='1' cpuset='16'/>
+    <vcpupin vcpu='2' cpuset='1'/>
+    <vcpupin vcpu='3' cpuset='17'/>
+    <vcpupin vcpu='4' cpuset='2'/>
+    <vcpupin vcpu='5' cpuset='18'/>
+    <vcpupin vcpu='6' cpuset='3'/>
+    <vcpupin vcpu='7' cpuset='19'/>
+    <vcpupin vcpu='8' cpuset='4'/>
+    <vcpupin vcpu='9' cpuset='20'/>
+    <vcpupin vcpu='10' cpuset='5'/>
+    <vcpupin vcpu='11' cpuset='21'/>
+    <vcpupin vcpu='12' cpuset='6'/>
+    <vcpupin vcpu='13' cpuset='22'/>
+    <vcpupin vcpu='14' cpuset='7'/>
+    <vcpupin vcpu='15' cpuset='23'/>
+    <emulatorpin cpuset='8,24'/>
     <iothreadpin iothread='1' cpuset='9,25'/>
     <iothreadpin iothread='2' cpuset='10,30'/>
-    <emulatorsched scheduler="fifo" priority="10"/>
-    <vcpusched vcpus="0" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="1" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="2" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="3" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="4" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="5" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="6" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="7" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="8" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="9" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="10" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="11" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="12" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="13" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="14" scheduler="rr" priority="1"/>
-    <vcpusched vcpus="15" scheduler="rr" priority="1"/>
   </cputune>
   <sysinfo type='smbios'>
     <bios>
@@ -103,7 +87,7 @@ or other application using the libvirt API.
         <direct state="on"/>
       </stimer>
       <reset state="on"/>
-      <vendor_id state="on" value="0123756792CD"/>
+      <vendor_id state="on" value="OriginalAMD"/>
       <frequencies state="on"/>
       <reenlightenment state="off"/>
       <tlbflush state="on"/>
@@ -119,10 +103,10 @@ or other application using the libvirt API.
   <cpu mode="host-passthrough" check="none" migratable="off">
     <topology sockets="1" dies="1" cores="8" threads="2"/>
     <cache mode="passthrough"/>
-    <feature policy="require" name="svm"/>
-    <feature policy="disable" name="hypervisor"/>
     <feature policy="disable" name="x2apic"/>
     <feature policy="require" name="topoext"/>
+    <feature policy="require" name="svm"/>
+    <feature policy="disable" name="hypervisor"/>
     <feature policy="require" name="amd-stibp"/>
     <feature policy="require" name="ibpb"/>
     <feature policy="require" name="stibp"/>
@@ -168,12 +152,24 @@ or other application using the libvirt API.
     <alias name="sata1-0-0"/>
     <address type="drive" controller="1" bus="0" target="0" unit="0"/>
   </disk>
-	<disk type="file" device="disk">
-  <driver name="qemu" type="raw"/>
-  <source file="/mnt/nvme_960_256gb.img"/>
-  <target dev="sdh" bus="sata"/>
-  <address type="drive" controller="1" bus="0" target="0" unit="1"/>
-	</disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+      <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
+      <target dev='sdb' bus='sata'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+    </disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+      <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97'/>
+      <target dev='sdc' bus='sata'/>
+      <address type='drive' controller='0' bus='0' target='0' unit='2'/>
+    </disk>
+    <disk type="file" device="disk">
+    <driver name="qemu" type="raw"/>
+    <source file="/mnt/nvme_960_256gb.img"/>
+    <target dev="sdh" bus="sata"/>
+    <address type="drive" controller="1" bus="0" target="0" unit="1"/>
+    </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
@@ -263,18 +259,6 @@ or other application using the libvirt API.
     <controller type='virtio-serial' index='0'>
       <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
     </controller>
-    <filesystem type='mount' accessmode='passthrough'>
-      <driver type='virtiofs' queue='1024'/>
-      <source dir='/home/nate/Music/RedSea'/>
-      <target dir='mount_tag'/>
-      <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
-    </filesystem>
-    <filesystem type="mount" accessmode="passthrough">
-      <driver type="virtiofs" queue='1024'/>
-      <source dir="/mnt2"/>
-      <target dir="mount_tag2"/>
-      <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
-    </filesystem>
     <interface type='bridge'>
       <mac address='52:54:00:90:46:ff'/>
       <source bridge='br0'/>

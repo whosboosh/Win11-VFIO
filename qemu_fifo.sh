@@ -29,7 +29,7 @@ enable_isolation () {
 arg="$1"
 shift
 if [ "$arg" == "--cleanup" ]; then
-	echo "Cleanup qemu fifo"
+	ec\ho "Cleanup qemu fifo"
 	disable_isolation
 	exit 0
 fi

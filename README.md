@@ -3,9 +3,9 @@ Collection of scripts and tweaks for making a Windows 11 virtual machine run wit
 Thanks to @Pimaker for the original configuration
 
 System details at time of writing:
-* Intel i7 12700KF
-* 32 GB RAM
-* RTX 3090 for Guest, AMD RX 570 for Host
+* AMD Ryzen 9 7950X3D
+* 64GB DDR5
+* RTX 3090 for Guest, AMD RX 570 for Host (Experimenting with 1660S atm)
 * Fedora host OS
 
 Made for VR Gaming, DJ'ing
@@ -31,7 +31,7 @@ reserve_pages 9000
 
 # Additional information
 * Network "br0" created using nmcli on the host
-* Kernel parameters: `vfio-pci.ids=10de:2204,10de,1aef amd_iommu=on iommu=pt kvm.ignore_msrs=1 amd_pstate=passive mitigations=off rd.driver.pre=vfio-pci resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 hugepagesz=11000 default_hugepagesz=2048K rd.driver.blacklist=nouveau modprobe.blacklist=nouveau crashkernel=256M preempt=voluntary nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=1 pcie_acs_override=downstream,multifunction vfio_iommu_type1.allow_unsafe_interrupts=`
+* Kernel parameters: `vfio-pci.ids=10de:2204,10de,1aef amd_iommu=on iommu=pt kvm.ignore_msrs=1 amd_pstate=passive mitigations=off rd.driver.pre=vfio-pci resume=UUID=24afaf05-41c1-47e3-8521-f62dbbf8ff53 hugepagesz=11000 default_hugepagesz=2048K rd.driver.blacklist=nouveau modprobe.blacklist=nouveau crashkernel=256M preempt=voluntary nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=1 pcie_acs_override=downstream,multifunction vfio_iommu_type1.allow_unsafe_interrupts=1`
 * USB via passed through via a PCIE USB card, Mouse/Keyboard use SPICE with Looking glass
 * Audio works via [Scream](https://github.com/duncanthrax/scream) (using LAN)
 * x11vnc is used to VNC back to Host from Guest

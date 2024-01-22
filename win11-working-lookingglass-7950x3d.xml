@@ -95,19 +95,20 @@ or other application using the libvirt API.
       <hidden state="on"/>
     </kvm>
     <ioapic driver="kvm"/>
+    <vmport state="off"/>
   </features>
   <cpu mode="host-passthrough" check="none" migratable="off">
     <topology sockets="1" dies="1" cores="8" threads="2"/>
     <cache mode="passthrough"/>
+    <feature policy='require' name='invtsc'/>
     <feature policy="require" name="topoext"/>
-		<feature policy="require" name='invtsc'/>
     <feature policy="disable" name="svm"/>
-		<feature policy="disable" name="x2apic"/>
     <feature policy="disable" name="hypervisor"/>
+    <feature policy="disable" name="x2apic"/>
   </cpu>
   <clock offset="utc">
-    <timer name="rtc" present="no" tickpolicy="catchup"/>
-    <timer name="pit" present="no" tickpolicy="discard"/>
+    <timer name="rtc" tickpolicy="catchup"/>
+    <timer name='pit' tickpolicy='discard'/>
     <timer name="hpet" present="no"/>
     <timer name="tsc" present="yes" mode="native"/>
     <timer name="hypervclock" present="yes"/>

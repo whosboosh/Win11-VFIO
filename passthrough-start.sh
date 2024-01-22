@@ -86,7 +86,7 @@ sysctl -w kernel.watchdog=0
 echo "VM starting..."
 # Remove existing VM
 virsh undefine --nvram win11
-virsh define win11-working-lookingglass.xml
+virsh define win11-working-lookingglass-7950x3d.xml
 virsh start win11
 echo
 

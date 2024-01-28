@@ -1,0 +1,1 @@
+intremap=no_x2apic_optout rcu_nocbs=0-7,16-23 nohz_full=0-7,16-23 isolcpus=0-7,16-23 clocksource=tsc clock=tsc force_tsc_stable=1

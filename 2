@@ -79,7 +79,7 @@ fi
 #echo "Performing minor optimizations prior to launch..."
 #sysctl vm.stat_interval=120
 #sysctl -w kernel.watchdog=0
-#sysctl kernel.sched_rt_runtime_us=1000000
+sysctl kernel.sched_rt_runtime_us=1000000
 
 # Start VM via virt-manager
 echo "VM starting..."
@@ -92,7 +92,7 @@ echo
 # Start looking glass
 sudo -u nate ./start-lookingglass.sh &
 
-sleep 20
+sleep 10
 ./qemu_fifo.sh
 
 # Print status and wait for exit

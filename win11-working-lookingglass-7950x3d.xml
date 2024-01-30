@@ -24,11 +24,7 @@ or other application using the libvirt API.
     <discard/>
   </memoryBacking>
  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
-  <iothreads>2</iothreads>
-  <iothreadids>
-    <iothread id='1'/>
-    <iothread id='2'/>
-  </iothreadids>
+ <iothreads>2</iothreads>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
     <vcpupin vcpu='1' cpuset='16'/>
@@ -87,7 +83,6 @@ or other application using the libvirt API.
     <type arch='x86_64' machine='pc-q35-9.0'>hvm</type>
     <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
     <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
-    <boot dev='hd'/>
     <bootmenu enable='no'/>
     <smbios mode='sysinfo'/>
   </os>
@@ -100,28 +95,50 @@ or other application using the libvirt API.
       <spinlocks state="on" retries="8191"/>
       <vpindex state="on"/>
       <synic state="on"/>
-      <stimer state="on" />
+      <stimer state="on">
+        <direct state="on"/>
+      </stimer>
       <reset state="on"/>
       <vendor_id state="on" value="1234567890ab"/>
       <frequencies state="on"/>
+      <tlbflush state="on"/>
+      <evmcs state="off"/>
+      <ipi state="on"/>
+      <avic state="on"/>
     </hyperv>
 	  <pmu state='off'/>
     <vmport state='off'/>
-    <smm state='on'/>	
   </features>
   <cpu mode="host-passthrough" check="none" migratable="off">
     <topology sockets="1" dies="1" cores="8" threads="2"/>
     <cache mode="passthrough"/>
-    <feature policy='require' name='invtsc'/>
-    <feature policy="require" name="topoext"/>
     <feature policy="disable" name="x2apic"/>
+    <feature policy="require" name="topoext"/>
     <feature policy="disable" name="svm"/>
     <feature policy="disable" name="hypervisor"/>
-		<feature policy='disable' name='monitor'/>
+    <feature policy="require" name="amd-stibp"/>
+    <feature policy="require" name="ibpb"/>
+    <feature policy="require" name="stibp"/>
+    <feature policy="require" name="virt-ssbd"/>
+    <feature policy="require" name="amd-ssbd"/>
+    <feature policy="require" name="pdpe1gb"/>
+    <feature policy="require" name="tsc-deadline"/>
+    <feature policy="require" name="tsc_adjust"/>
+    <feature policy="require" name="arch-capabilities"/>
+    <feature policy="require" name="rdctl-no"/>
+    <feature policy="require" name="skip-l1dfl-vmentry"/>
+    <feature policy="require" name="mds-no"/>
+    <feature policy="require" name="pschange-mc-no"/>
+    <feature policy="require" name="invtsc"/>
+    <feature policy="require" name="cmp_legacy"/>
+    <feature policy="require" name="xsaves"/>
+    <feature policy="require" name="perfctr_core"/>
+    <feature policy="require" name="clzero"/>
+    <feature policy="require" name="xsaveerptr"/>
   </cpu>
   <clock offset="localtime">
     <timer name="rtc" tickpolicy="catchup"/>
-    <timer name='pit' tickpolicy='delay'/>
+    <timer name='pit' tickpolicy='discard'/>
     <timer name="hpet" present="no"/>
     <timer name="tsc" present="yes" mode="native"/>
     <timer name="hypervclock" present="yes"/>
@@ -135,38 +152,39 @@ or other application using the libvirt API.
   </pm>
   <devices>
     <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
-  <disk type="file" device="disk">
-    <driver name="qemu" type="qcow2"/>
-    <source file="/mnt/qemu/vm.qcow2" index="1"/>
-    <backingStore/>
-    <target dev="sdg" bus="sata"/>
-    <alias name="sata1-0-0"/>
-    <address type="drive" controller="1" bus="0" target="0" unit="0"/>
-  </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
-      <target dev='sdb' bus='sata'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='1'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97'/>
-      <target dev='sdc' bus='sata'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='2'/>
-    </disk>
     <disk type="file" device="disk">
-    <driver name="qemu" type="raw"/>
-    <source file="/mnt/nvme_960_256gb.img"/>
-    <target dev="sdh" bus="sata"/>
-    <address type="drive" controller="1" bus="0" target="0" unit="1"/>
+      <driver name="qemu" type="qcow2"/>
+      <source file="/mnt/qemu/vm.qcow2" index="1"/>
+      <backingStore/>
+      <target dev="sdg" bus="sata"/>
+      <alias name="sata1-0-0"/>
+      <boot order="1"/>
+      <address type="drive" controller="1" bus="0" target="0" unit="0"/>
     </disk>
-  <disk type="block" device="disk">
-    <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
-    <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX" index="1"/>
-    <target dev="sdi" bus="sata"/>
-    <address type="drive" controller="1" bus="0" target="0" unit="2"/>
-  </disk>
+      <disk type='block' device='disk'>
+        <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+        <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
+        <target dev='sdb' bus='sata'/>
+        <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+      </disk>
+      <disk type='block' device='disk'>
+        <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+        <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97'/>
+        <target dev='sdc' bus='sata'/>
+        <address type='drive' controller='0' bus='0' target='0' unit='2'/>
+      </disk>
+      <disk type="file" device="disk">
+      <driver name="qemu" type="raw"/>
+      <source file="/mnt/nvme_960_256gb.img"/>
+      <target dev="sdh" bus="sata"/>
+      <address type="drive" controller="1" bus="0" target="0" unit="1"/>
+      </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX" index="1"/>
+      <target dev="sdi" bus="sata"/>
+      <address type="drive" controller="1" bus="0" target="0" unit="2"/>
+    </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </controller>
@@ -306,7 +324,7 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x00' slot='0x1b' function='0x0'/>
     </sound>
     <audio id='1' type='spice'/>
-    <video>
+		<video>
       <model type='none'/>
     </video>
     <hostdev mode='subsystem' type='pci' managed='yes'>

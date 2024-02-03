@@ -116,29 +116,10 @@ or other application using the libvirt API.
     <feature policy="require" name="topoext"/>
     <feature policy="disable" name="svm"/>
     <feature policy="disable" name="hypervisor"/>
-    <feature policy="require" name="amd-stibp"/>
-    <feature policy="require" name="ibpb"/>
-    <feature policy="require" name="stibp"/>
-    <feature policy="require" name="virt-ssbd"/>
-    <feature policy="require" name="amd-ssbd"/>
-    <feature policy="require" name="pdpe1gb"/>
-    <feature policy="require" name="tsc-deadline"/>
-    <feature policy="require" name="tsc_adjust"/>
-    <feature policy="require" name="arch-capabilities"/>
-    <feature policy="require" name="rdctl-no"/>
-    <feature policy="require" name="skip-l1dfl-vmentry"/>
-    <feature policy="require" name="mds-no"/>
-    <feature policy="require" name="pschange-mc-no"/>
-    <feature policy="require" name="invtsc"/>
-    <feature policy="require" name="cmp_legacy"/>
-    <feature policy="require" name="xsaves"/>
-    <feature policy="require" name="perfctr_core"/>
-    <feature policy="require" name="clzero"/>
-    <feature policy="require" name="xsaveerptr"/>
   </cpu>
   <clock offset="localtime">
     <timer name="rtc" tickpolicy="catchup"/>
-    <timer name='pit' tickpolicy='discard'/>
+    <timer name='pit' tickpolicy='delay'/>
     <timer name="hpet" present="no"/>
     <timer name="tsc" present="yes" mode="native"/>
     <timer name="hypervclock" present="yes"/>
@@ -156,34 +137,24 @@ or other application using the libvirt API.
       <driver name="qemu" type="qcow2"/>
       <source file="/mnt/qemu/vm.qcow2" index="1"/>
       <backingStore/>
-      <target dev="sdg" bus="sata"/>
+      <target dev="sdg" bus="virtio"/>
       <alias name="sata1-0-0"/>
       <boot order="1"/>
-      <address type="drive" controller="1" bus="0" target="0" unit="0"/>
     </disk>
       <disk type='block' device='disk'>
         <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
         <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT'/>
-        <target dev='sdb' bus='sata'/>
-        <address type='drive' controller='0' bus='0' target='0' unit='1'/>
-      </disk>
-      <disk type='block' device='disk'>
+        <target dev='sdb' bus='virtio'/>
+    </disk>
+    <disk type='block' device='disk'>
         <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
         <source dev='/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97'/>
-        <target dev='sdc' bus='sata'/>
-        <address type='drive' controller='0' bus='0' target='0' unit='2'/>
-      </disk>
-      <disk type="file" device="disk">
+        <target dev='sdc' bus='virtio'/>
+    </disk>
+    <disk type="file" device="disk">
       <driver name="qemu" type="raw"/>
       <source file="/mnt/nvme_960_256gb.img"/>
-      <target dev="sdh" bus="sata"/>
-      <address type="drive" controller="1" bus="0" target="0" unit="1"/>
-      </disk>
-    <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
-      <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX" index="1"/>
-      <target dev="sdi" bus="sata"/>
-      <address type="drive" controller="1" bus="0" target="0" unit="2"/>
+      <target dev="sdh" bus="virtio"/>
     </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -292,14 +263,6 @@ or other application using the libvirt API.
     <input type='evdev'>
       <source dev='/dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd' grab='all' grabToggle='ctrl-ctrl' repeat='on'/>
     </input>
-  <hostdev mode="subsystem" type="usb" managed="yes">
-    <source>
-      <vendor id="0x13d3"/>
-      <product id="0x3571"/>
-      <address bus="3" device="2"/>
-    </source>
-    <address type="usb" bus="0" port="1"/>
-  </hostdev>
     <channel type='spicevmc'>
       <target type='virtio' name='com.redhat.spice.0'/>
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
@@ -327,31 +290,25 @@ or other application using the libvirt API.
 		<video>
       <model type='none'/>
     </video>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x00' slot='0x14' function='0x0'/>
+        <address domain="0x0000" bus="0x15" slot="0x00" function="0x0"/>
       </source>
-      <address type='pci' domain='0x0000' bus='0x10' slot='0x03' function='0x0'/>
+      <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
+      <rom bar="off"/>
     </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
+        <address domain="0x0000" bus="0x15" slot="0x00" function="0x1"/>
       </source>
-      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+      <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
+      <rom bar="off"/>
     </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
+    <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+        <address domain="0x0000" bus="0x0d" slot="0x00" function="0x0"/>
       </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <source>
-        <address domain='0x0000' bus='0x05' slot='0x00' function='0x1'/>
-      </source>
-      <rom bar='off'/>
-      <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
+      <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
     </hostdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>

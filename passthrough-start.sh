@@ -48,7 +48,7 @@ fi
 pstate-frequency --set -p max
 
 # Hugepages config
-export HUGEPAGES=11000
+export HUGEPAGES=16000
 
 # Note that allocating hugepages after boot has a chance to fail. If continuous memory
 # cannot be allocated, a reboot will be required.
@@ -76,11 +76,10 @@ else
     echo "Hugepages already found, let's use those!"
 fi
 
-echo "Performing minor optimizations prior to launch..."
-echo 041 > /sys/devices/virtual/workqueue/cpumask
-for i in /sys/devices/virtual/workqueue/*/cpumask; do echo 041 > $i; done;
-sysctl vm.stat_interval=120
-sysctl -w kernel.watchdog=0
+#echo "Performing minor optimizations prior to launch..."
+#sysctl vm.stat_interval=120
+#sysctl -w kernel.watchdog=0
+#sysctl kernel.sched_rt_runtime_us=1000000
 
 # Start VM via virt-manager
 echo "VM starting..."
@@ -93,7 +92,7 @@ echo
 # Start looking glass
 sudo -u nate ./start-lookingglass.sh &
 
-sleep 10
+sleep 20
 ./qemu_fifo.sh
 
 # Print status and wait for exit

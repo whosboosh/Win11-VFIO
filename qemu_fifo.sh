@@ -10,16 +10,19 @@ disable_isolation () {
                 cpuset-modify --cpus C$ACPUS /user.slice \
                 irq-affinity mask C$ACPUS
 
-
         taskset -pc 0-23 2  # kthreadd reset
 }
 
 enable_isolation () {
+        chrt -a -f -p 99 $(pidof qemu-system-x86_64)
+        echo "Set QEMU execution policy!"
+        chrt -p $(pidof qemu-system-x86_64)
+
         vfio-isolate \
                 drop-caches \
                 cpuset-modify --cpus C$HCPUS /system.slice \
                 cpuset-modify --cpus C$HCPUS /user.slice \
-		move-tasks / /system.slice \
+                                                                move-tasks / /system.slice \
                 compact-memory \
                 irq-affinity mask C$MCPUS
 
@@ -39,5 +42,6 @@ if [[ $(sudo virsh list --all | grep running) ]]; then
   enable_isolation
 else
   echo "VM no longer running, aborting"
+  disable_isolation
   exit 1
 fi

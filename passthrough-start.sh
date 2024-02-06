@@ -3,7 +3,8 @@
 name=win10
 redefine=
 optimisations=
-while getopts "o:rn:c:" arg; do
+start=true
+while getopts "orpn:c:" arg; do
   case $arg in
     o)
       optimisations=true
@@ -17,6 +18,10 @@ while getopts "o:rn:c:" arg; do
       name=${OPTARG}
 	  shift
       ;;
+	p)
+	  start=true
+	  shift
+	  ;;
   esac
 done
 
@@ -93,25 +98,29 @@ if [ ! -z $optimisations ]; then
 	fi
 
 	#echo "Performing minor optimizations prior to launch..."
-	sysctl vm.stat_interval=120
-	sysctl -w kernel.watchdog=0
-	sysctl kernel.sched_rt_runtime_us=1000000
+	#sysctl vm.stat_interval=120
+	#sysctl -w kernel.watchdog=0
+	#sysctl kernel.sched_rt_runtime_us=1000000
 fi
 
-# Start VM via virt-manager
-echo "VM starting..."
+
 if [ ! -z $redefine ]; then
 # Remove existing VM
 	virsh undefine --nvram $name
 	virsh define $name-working-lookingglass-7950x3d.xml
 fi
-virsh start $name
 
-# Start looking glass
-sudo -u nate ./start-lookingglass.sh &
+if [ ! -z $start ]; then
+	# Start VM via virt-manager
+	echo "VM starting..."
+	virsh start $name
 
-sleep 20
-./qemu_fifo.sh
+	# Start looking glass
+	sudo -u nate ./start-lookingglass.sh &
+
+	sleep 20
+	./qemu_fifo.sh
+fi
 
 # Print status and wait for exit
 while [[ $(virsh list --all | grep running) ]]; do

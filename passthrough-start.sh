@@ -4,15 +4,13 @@ name=win10
 redefine=
 optimisations=
 start=true
-while getopts "orpn:c:" arg; do
-  case $arg in
+while getopts "orpn:" o; do
+    case "${o}" in
     o)
       optimisations=true
-	  shift
       ;;
     r)
       redefine=true
-	  shift
       ;;
     n)
       name=${OPTARG}
@@ -20,10 +18,13 @@ while getopts "orpn:c:" arg; do
       ;;
 	p)
 	  start=true
-	  shift
 	  ;;
   esac
 done
+
+echo redefine: $redefine
+echo name: $name
+echo start: $start
 
 # Necessary for parameter usage in cleanup()
 export TMP_PARAMS="$*"

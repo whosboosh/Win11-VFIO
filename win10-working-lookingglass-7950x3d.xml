@@ -24,7 +24,11 @@ or other application using the libvirt API.
     <discard/>
   </memoryBacking>
  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
- <iothreads>2</iothreads>
+  <iothreads>2</iothreads>
+  <iothreadids>
+    <iothread id='1'/>
+    <iothread id='2'/>
+  </iothreadids>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
     <vcpupin vcpu='1' cpuset='16'/>
@@ -83,7 +87,7 @@ or other application using the libvirt API.
     <type arch='x86_64' machine='pc-q35-9.0'>hvm</type>
     <loader readonly='yes' secure='no' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
     <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win10_VARS.fd</nvram>
-    <bootmenu enable='yes'/>
+    <bootmenu enable='no'/>
     <smbios mode='host'/>
   </os>
   <features>
@@ -133,17 +137,35 @@ or other application using the libvirt API.
   </pm>
   <devices>
     <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
-    <disk type="file" device="disk">
-      <driver name="qemu" type="qcow2"/>
-      <source file="/mnt/win10.qcow2" index="1"/>
-      <backingStore/>
-      <target dev="sdg" bus="virtio"/>
-      <alias name="sata1-0-0"/>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <source dev="/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A"/>
+      <target dev="vda" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT"/>
+      <target dev="vdb" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x08" slot="0x00" function="0x0"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97"/>
+      <target dev="vdc" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x0d" slot="0x00" function="0x0"/>
     </disk>
     <disk type="file" device="disk">
       <driver name="qemu" type="raw"/>
       <source file="/mnt/nvme_960_256gb.img"/>
-      <target dev="sdh" bus="virtio"/>
+      <target dev="vdd" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x0e" slot="0x00" function="0x0"/>
+    </disk>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="qcow2"/>
+      <source file="/mnt/qemu/vm.qcow2"/>
+      <target dev="vde" bus="virtio"/>
+      <address type="pci" domain="0x0000" bus="0x0f" slot="0x00" function="0x0"/>
     </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -277,25 +299,23 @@ or other application using the libvirt API.
     </sound>
     <audio id='1' type='spice'/>
 		<video>
-      <model type='qxl'/>
+      <model type='none'/>
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x16" slot="0x00" function="0x0"/>
+        <address domain="0x0000" bus="0x15" slot="0x00" function="0x0"/>
       </source>
-      <rom bar="off"/>
       <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
     </hostdev>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x16" slot="0x00" function="0x1"/>
+        <address domain="0x0000" bus="0x15" slot="0x00" function="0x1"/>
       </source>
-      <rom bar="off"/>
       <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
     </hostdev>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x0e" slot="0x00" function="0x0"/>
+        <address domain="0x0000" bus="0x0d" slot="0x00" function="0x0"/>
       </source>
       <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
     </hostdev>
@@ -304,11 +324,6 @@ or other application using the libvirt API.
     </redirdev>
     <watchdog model='itco' action='reset'/>
     <memballoon model='none'/>
-    <shmem name='looking-glass'>
-      <model type='ivshmem-plain'/>
-      <size unit='M'>256</size>
-      <address type='pci' domain='0x0000' bus='0x10' slot='0x01' function='0x0'/>
-    </shmem>
   </devices>
   <qemu:commandline>
     <qemu:arg value='-fw_cfg'/>
@@ -317,6 +332,10 @@ or other application using the libvirt API.
     <qemu:arg value="socket,id=mon1,server=on,wait=off,path=/tmp/qmp-sock"/>
     <qemu:arg value="-mon"/>
     <qemu:arg value="chardev=mon1,mode=control,pretty=on"/>
+    <qemu:arg value='-device'/>
+    <qemu:arg value='{"driver":"ivshmem-plain","id":"shmem0","memdev":"looking-glass"}'/>
+    <qemu:arg value='-object'/>
+    <qemu:arg value='{"qom-type":"memory-backend-file","id":"looking-glass","mem-path":"/dev/kvmfr0","size":268435456,"share":true}'/>
   </qemu:commandline>
   <qemu:capabilities>
     <qemu:del capability="usb-host.hostdevice"/>

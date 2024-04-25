@@ -3,7 +3,7 @@
 name=win10
 redefine=
 optimisations=
-start=true
+start=
 while getopts "orpn:" o; do
     case "${o}" in
     o)
@@ -38,13 +38,8 @@ cleanup () {
 
 	echo $TMP_PARAMS
 
-	if [[ $TMP_PARAMS == *'--keep-hugepages'* ]]
-	then
-		echo "Skipping hugepage deletion..."
-	else
-		echo "Deleting hugepages..."
-		echo "0" > /proc/sys/vm/nr_hugepages
-	fi
+	echo "Deleting hugepages..."
+	echo "0" > /proc/sys/vm/nr_hugepages
 
 	echo "Undoing kernel optimizations..."
 	echo fff > /sys/devices/virtual/workqueue/cpumask
@@ -98,12 +93,18 @@ if [ ! -z $optimisations ]; then
 		echo "Hugepages already found, let's use those!"
 	fi
 
-	#echo "Performing minor optimizations prior to launch..."
-	#sysctl vm.stat_interval=120
-	#sysctl -w kernel.watchdog=0
+	echo "Performing minor optimizations prior to launch..."
+	#echo 041 > /sys/devices/virtual/workqueue/cpumask
+	#echo -1 > /proc/sys/kernel/sched_rt_runtime_us	
+	sysctl vm.stat_interval=120
+	sysctl -w kernel.watchdog=0
 	#sysctl kernel.sched_rt_runtime_us=1000000
 fi
 
+# Set GPU to vfio-pci
+driverctl set-override 0000:01:00.0 vfio-pci
+driverctl set-override 0000:01:00.1 vfio-pci
+driverctl set-override 0000:15:00.0 vfio-pci
 
 if [ ! -z $redefine ]; then
 # Remove existing VM
@@ -116,8 +117,7 @@ if [ ! -z $start ]; then
 	echo "VM starting..."
 	virsh start $name
 
-	# Start looking glass
-	sudo -u nate ./start-lookingglass.sh &
+	./start-lookingglass.sh
 
 	sleep 20
 	./qemu_fifo.sh

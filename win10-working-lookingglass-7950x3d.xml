@@ -24,10 +24,13 @@ or other application using the libvirt API.
     <discard/>
   </memoryBacking>
  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
-  <iothreads>2</iothreads>
+  <iothreads>4</iothreads>
   <iothreadids>
     <iothread id='1'/>
     <iothread id='2'/>
+    <iothread id='3'/>
+    <iothread id='4'/>
+    <iothread id='5'/>
   </iothreadids>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
@@ -46,9 +49,11 @@ or other application using the libvirt API.
     <vcpupin vcpu='13' cpuset='22'/>
     <vcpupin vcpu='14' cpuset='7'/>
     <vcpupin vcpu='15' cpuset='23'/>
-    <emulatorpin cpuset="15,31"/>
-    <iothreadpin iothread="1" cpuset="13,29"/>
-    <iothreadpin iothread="2" cpuset="14,30"/>
+    <emulatorpin cpuset="24,31"/>
+    <iothreadpin iothread="1" cpuset="8,15"/>
+    <iothreadpin iothread="2" cpuset="8,15"/>
+    <iothreadpin iothread="3" cpuset="24,31"/>
+    <iothreadpin iothread="4" cpuset="24,31"/>
     <emulatorsched scheduler="fifo" priority="10"/>
     <vcpusched vcpus="0" scheduler="rr" priority="1"/>
     <vcpusched vcpus="1" scheduler="rr" priority="1"/>
@@ -84,7 +89,7 @@ or other application using the libvirt API.
     </system>
   </sysinfo>
   <os>
-    <type arch='x86_64' machine='pc-q35-8.1'>hvm</type>
+    <type arch='x86_64' machine='pc-q35-9.0'>hvm</type>
     <loader readonly='yes' secure='no' type='pflash'>/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
     <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
     <bootmenu enable='yes'/>
@@ -138,30 +143,30 @@ or other application using the libvirt API.
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
-     <source dev="/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A"/>
-      <target dev="vda" bus="sata"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="1" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A"/>
+      <target dev="vda" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="2" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT"/>
-      <target dev="vdb" bus="sata"/>
+      <target dev="vdb" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="3" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97"/>
-      <target dev="vdc" bus="sata"/>
+      <target dev="vdc" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="4" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX"/>
-      <target dev="vdd" bus="sata"/>
+      <target dev="vdd" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="native" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_65PB50FUKMBX"/>
-      <target dev="vde" bus="sata"/>
-    </disk>    
+      <target dev="vde" bus="virtio"/>
+    </disk> 
     <!--<disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
       <source file="/mnt/win10-updated.qcow2" index="1"/>

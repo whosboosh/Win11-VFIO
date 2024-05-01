@@ -48,6 +48,9 @@ cleanup () {
 	sysctl vm.stat_interval=1
 	sysctl -w kernel.watchdog=1
 
+	driverctl unset-override 0000:01:00.0
+	driverctl unset-override 0000:01:00.1	
+
 	sleep 2
 	./qemu_fifo.sh --cleanup
 }

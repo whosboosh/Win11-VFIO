@@ -54,6 +54,7 @@ or other application using the libvirt API.
     <iothreadpin iothread="2" cpuset="8,15"/>
     <iothreadpin iothread="3" cpuset="24,31"/>
     <iothreadpin iothread="4" cpuset="24,31"/>
+    <iothreadpin iothread="5" cpuset="15,21"/>
     <emulatorsched scheduler="fifo" priority="10"/>
     <vcpusched vcpus="0" scheduler="rr" priority="1"/>
     <vcpusched vcpus="1" scheduler="rr" priority="1"/>
@@ -166,7 +167,13 @@ or other application using the libvirt API.
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_65PB50FUKMBX"/>
       <target dev="vde" bus="virtio"/>
-    </disk> 
+    </disk>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" ioeventfd="on" discard="unmap"/>
+      <source file="/mnt/library.img" index="1"/>
+      <backingStore/>
+      <target dev="vdg" bus="virtio"/>
+    </disk>  
     <!--<disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
       <source file="/mnt/win10-updated.qcow2" index="1"/>

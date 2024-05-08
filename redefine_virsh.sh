@@ -1,7 +1,14 @@
 #!/bin/sh
 
-config=$1
-echo $1
+name=win10
+while getopts "n:" arg; do
+  case $arg in
+    n)
+      name=${OPTARG}
+	  shift
+      ;;
+  esac
+done
 
-virsh undefine --nvram win11
+virsh undefine --nvram $name
 virsh define $1

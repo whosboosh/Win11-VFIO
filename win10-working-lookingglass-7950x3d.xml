@@ -89,12 +89,15 @@ or other application using the libvirt API.
       <entry name='family'>B650</entry>
     </system>
   </sysinfo>
-  <os>
-    <type arch='x86_64' machine='pc-q35-9.0'>hvm</type>
-    <loader readonly='yes' secure='no' type='pflash'>/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
-    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
+  <os firmware="efi">
+    <type arch='x86_64' machine='pc-q35-8.2'>hvm</type>
     <bootmenu enable='yes'/>
     <smbios mode='host'/>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
+    <firmware>
+        <feature enabled='yes' name='secure-boot'/>
+        <feature enabled='yes' name='enrolled-keys'/>
+    </firmware>
   </os>
   <features>
     <acpi/>
@@ -116,13 +119,14 @@ or other application using the libvirt API.
       <ipi state="on"/>
       <avic state="on"/>
     </hyperv>
-	  <pmu state='off'/>
+    <pmu state='off'/>
     <vmport state='off'/>
   </features>
   <cpu mode="host-passthrough" check="none" migratable="off">
     <topology sockets="1" dies="1" cores="8" threads="2"/>
     <cache mode="passthrough"/>
-    <feature policy="require" name="x2apic"/>
+    <feature policy='require' name='invtsc'/>
+    <feature policy="disable" name="x2apic"/>
     <feature policy="require" name="topoext"/>
     <feature policy="disable" name="svm"/>
     <feature policy="disable" name="hypervisor"/>
@@ -142,7 +146,7 @@ or other application using the libvirt API.
     <suspend-to-disk enabled='no'/>
   </pm>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
     <disk type="block" device="disk">
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="1" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A"/>
@@ -159,7 +163,7 @@ or other application using the libvirt API.
       <target dev="vdc" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="4" ioeventfd="on" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX"/>
       <target dev="vdd" bus="virtio"/>
     </disk>
@@ -169,14 +173,14 @@ or other application using the libvirt API.
       <target dev="vde" bus="virtio"/>
     </disk>
     <disk type="file" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" ioeventfd="on" discard="unmap"/>
-      <source file="/mnt/library.img" index="1"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="4" ioeventfd="on" discard="unmap"/>
+      <source file="/mnt/storage/library.img" index="1"/>
       <backingStore/>
       <target dev="vdg" bus="virtio"/>
-    </disk>  
+    </disk>
     <!--<disk type="file" device="disk">
       <driver name="qemu" type="qcow2"/>
-      <source file="/mnt/win10-updated.qcow2" index="1"/>
+      <source file="/mnt/storage/win10-updated.qcow2" index="1"/>
       <backingStore/>
       <target dev="vdf" bus="sata"/>
       <boot order="1"/>
@@ -300,8 +304,8 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x00' slot='0x1b' function='0x0'/>
     </sound>
     <audio id='1' type='spice'/>
-		<video>
-      <model type='qxl'/>
+    <video>
+      <model type='none'/>
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
@@ -350,6 +354,8 @@ or other application using the libvirt API.
     <qemu:arg value='{"driver":"ivshmem-plain","id":"shmem0","memdev":"looking-glass"}'/>
     <qemu:arg value='-object'/>
     <qemu:arg value='{"qom-type":"memory-backend-file","id":"looking-glass","mem-path":"/dev/kvmfr0","size":268435456,"share":true}'/>
+    <qemu:arg value="-device"/>
+    <qemu:arg value="{&quot;driver&quot;:&quot;acpi-cppc&quot;,&quot;processors&quot;:[&quot;0:0:261:121:86:12&quot;,&quot;1:0:261:121:86:12&quot;,&quot;2:2:266:121:86:12&quot;,&quot;3:2:266:121:86:12&quot;,&quot;4:4:276:121:86:12&quot;,&quot;5:4:276:121:86:12&quot;,&quot;6:6:256:121:86:12&quot;,&quot;7:6:256:121:86:12&quot;,&quot;8:8:276:121:86:12&quot;,&quot;9:8:276:121:86:12&quot;,&quot;10:10:251:121:86:12&quot;,&quot;11:10:251:121:86:12&quot;,&quot;12:12:271:121:86:12&quot;,&quot;13:12:271:121:86:12&quot;,&quot;14:14:246:121:86:12&quot;,&quot;15:14:246:121:86:12&quot;]}"/>
   </qemu:commandline>
   <qemu:capabilities>
     <qemu:del capability="usb-host.hostdevice"/>

@@ -98,10 +98,9 @@ if [ ! -z $optimisations ]; then
 
 	echo "Performing minor optimizations prior to launch..."
 	#echo 041 > /sys/devices/virtual/workqueue/cpumask
-	#echo -1 > /proc/sys/kernel/sched_rt_runtime_us	
+	sysctl -w kernel.sched_rt_runtime_us=-1
 	sysctl vm.stat_interval=120
 	sysctl -w kernel.watchdog=0
-	#sysctl kernel.sched_rt_runtime_us=1000000
 fi
 
 # Set GPU to vfio-pci

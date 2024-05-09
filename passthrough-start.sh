@@ -44,7 +44,6 @@ cleanup () {
 	echo "Undoing kernel optimizations..."
 	echo fff > /sys/devices/virtual/workqueue/cpumask
 	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
-	echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
 	sysctl vm.stat_interval=1
 	sysctl -w kernel.watchdog=1
 
@@ -98,7 +97,7 @@ if [ ! -z $optimisations ]; then
 
 	echo "Performing minor optimizations prior to launch..."
 	#echo 041 > /sys/devices/virtual/workqueue/cpumask
-	sysctl -w kernel.sched_rt_runtime_us=-1
+	#sysctl -w kernel.sched_rt_runtime_us=-1
 	sysctl vm.stat_interval=120
 	sysctl -w kernel.watchdog=0
 fi
@@ -121,7 +120,7 @@ if [ ! -z $start ]; then
 
 	./start-lookingglass.sh
 
-	sleep 20
+	sleep 40
 	./qemu_fifo.sh
 fi
 

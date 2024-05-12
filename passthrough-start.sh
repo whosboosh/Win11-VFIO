@@ -42,13 +42,14 @@ cleanup () {
 	echo "0" > /proc/sys/vm/nr_hugepages
 
 	echo "Undoing kernel optimizations..."
+    echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
 	echo fff > /sys/devices/virtual/workqueue/cpumask
 	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
 	sysctl vm.stat_interval=1
 	sysctl -w kernel.watchdog=1
 
 	driverctl unset-override 0000:01:00.0
-	driverctl unset-override 0000:01:00.1	
+	driverctl unset-override 0000:01:00.1
 
 	sleep 2
 	./qemu_fifo.sh --cleanup
@@ -114,13 +115,16 @@ if [ ! -z $redefine ]; then
 fi
 
 if [ ! -z $start ]; then
+    # Fix a bug where RT scheduler will crash host kernel if applied before VM start
+    echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
+
 	# Start VM via virt-manager
 	echo "VM starting..."
 	virsh start $name
 
 	./start-lookingglass.sh
 
-	sleep 40
+	sleep 120
 	./qemu_fifo.sh
 fi
 

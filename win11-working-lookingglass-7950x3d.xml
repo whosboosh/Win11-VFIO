@@ -1,16 +1,9 @@
-<!--
-WARNING: THIS IS AN AUTO-GENERATED FILE. CHANGES TO IT ARE LIKELY TO BE
-OVERWRITTEN AND LOST. Changes to this xml configuration should be made using:
-  virsh edit win11
-or other application using the libvirt API.
--->
-
 <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
   <name>win11</name>
   <uuid>ebef7cd8-a8ce-5311-a4b1-d8bbc18eb062</uuid>
   <metadata>
     <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
-      <libosinfo:os id="http://microsoft.com/win/11"/>
+      <libosinfo:os id="http://microsoft.com/win/10"/>
     </libosinfo:libosinfo>
   </metadata>
   <memory unit='KiB'>32000000</memory>
@@ -19,12 +12,19 @@ or other application using the libvirt API.
     <hugepages/>
     <nosharepages/>
     <locked/>
-    <access mode="shared"/>
+    <access mode="private"/>
     <allocation mode="immediate"/>
     <discard/>
   </memoryBacking>
  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
- <iothreads>2</iothreads>
+  <iothreads>4</iothreads>
+  <iothreadids>
+    <iothread id='1'/>
+    <iothread id='2'/>
+    <iothread id='3'/>
+    <iothread id='4'/>
+    <iothread id='5'/>
+  </iothreadids>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
     <vcpupin vcpu='1' cpuset='16'/>
@@ -42,9 +42,12 @@ or other application using the libvirt API.
     <vcpupin vcpu='13' cpuset='22'/>
     <vcpupin vcpu='14' cpuset='7'/>
     <vcpupin vcpu='15' cpuset='23'/>
-    <emulatorpin cpuset="15,31"/>
-    <iothreadpin iothread="1" cpuset="13,29"/>
-    <iothreadpin iothread="2" cpuset="14,30"/>
+    <emulatorpin cpuset="24,31"/>
+    <iothreadpin iothread="1" cpuset="8,15"/>
+    <iothreadpin iothread="2" cpuset="8,15"/>
+    <iothreadpin iothread="3" cpuset="24,31"/>
+    <iothreadpin iothread="4" cpuset="24,31"/>
+    <iothreadpin iothread="5" cpuset="15,21"/>
     <emulatorsched scheduler="fifo" priority="10"/>
     <vcpusched vcpus="0" scheduler="rr" priority="1"/>
     <vcpusched vcpus="1" scheduler="rr" priority="1"/>
@@ -79,12 +82,15 @@ or other application using the libvirt API.
       <entry name='family'>B650</entry>
     </system>
   </sysinfo>
-  <os>
-    <type arch='x86_64' machine='pc-q35-8.1'>hvm</type>
-    <loader readonly='yes' secure='no' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
-    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
+  <os firmware="efi">
+    <type arch='x86_64' machine='pc-q35-9.0'>hvm</type>
     <bootmenu enable='yes'/>
     <smbios mode='host'/>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'>/var/lib/libvirt/qemu/nvram/win11_VARS.fd</nvram>
+    <firmware>
+        <feature enabled='yes' name='secure-boot'/>
+        <feature enabled='yes' name='enrolled-keys'/>
+    </firmware>
   </os>
   <features>
     <acpi/>
@@ -99,19 +105,20 @@ or other application using the libvirt API.
         <direct state="on"/>
       </stimer>
       <reset state="on"/>
-      <vendor_id state="on" value="1234567890ab"/>
+      <vendor_id state="on" value="0123456789ab"/>
       <frequencies state="on"/>
       <tlbflush state="on"/>
       <evmcs state="off"/>
       <ipi state="on"/>
       <avic state="on"/>
     </hyperv>
-	  <pmu state='off'/>
+    <pmu state='off'/>
     <vmport state='off'/>
   </features>
   <cpu mode="host-passthrough" check="none" migratable="off">
     <topology sockets="1" dies="1" cores="8" threads="2"/>
     <cache mode="passthrough"/>
+    <feature policy='require' name='invtsc'/>
     <feature policy="disable" name="x2apic"/>
     <feature policy="require" name="topoext"/>
     <feature policy="disable" name="svm"/>
@@ -132,19 +139,37 @@ or other application using the libvirt API.
     <suspend-to-disk enabled='no'/>
   </pm>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type="file" device="disk">
-      <driver name="qemu" type="qcow2"/>
-      <source file="/mnt/qemu/vm.qcow2" index="1"/>
-      <backingStore/>
-      <target dev="sdg" bus="virtio"/>
-      <alias name="sata1-0-0"/>
-      <boot order="1"/>
+    <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" discard="unmap"/>
+      <source dev="/dev/disk/by-id/nvme-Phison_ESMP512GMB47C3-E13TS_22272M51245854"/>
+      <target dev="vda" bus="sata"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="2" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT"/>
+      <target dev="vdb" bus="virtio"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="3" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E4SVYN97"/>
+      <target dev="vdc" bus="virtio"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX"/>
+      <target dev="vdd" bus="virtio"/>
+    </disk>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/ata-OCZ-TRION100_65PB50FUKMBX"/>
+      <target dev="vde" bus="virtio"/>
     </disk>
     <disk type="file" device="disk">
-      <driver name="qemu" type="raw"/>
-      <source file="/mnt/nvme_960_256gb.img"/>
-      <target dev="sdh" bus="virtio"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="4" ioeventfd="on" discard="unmap"/>
+      <source file="/mnt/storage/library.img" index="1"/>
+      <backingStore/>
+      <target dev="vdg" bus="virtio"/>
     </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -235,24 +260,12 @@ or other application using the libvirt API.
     <controller type='virtio-serial' index='0'>
       <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
     </controller>
-    <filesystem type='mount' accessmode='passthrough'>
-      <driver type='virtiofs' queue='1024'/>
-      <source dir='/home/nate/Music/RedSea'/>
-      <target dir='mount_tag'/>
-      <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
-    </filesystem>
     <interface type='bridge'>
       <mac address='52:54:00:90:46:ff'/>
       <source bridge='br0'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x09' slot='0x00' function='0x0'/>
     </interface>
-    <input type='evdev'>
-      <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
-    </input>
-    <input type='evdev'>
-      <source dev='/dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd' grab='all' grabToggle='ctrl-ctrl' repeat='on'/>
-    </input>
     <channel type='spicevmc'>
       <target type='virtio' name='com.redhat.spice.0'/>
       <address type='virtio-serial' controller='0' bus='0' port='1'/>
@@ -277,39 +290,44 @@ or other application using the libvirt API.
       <address type='pci' domain='0x0000' bus='0x00' slot='0x1b' function='0x0'/>
     </sound>
     <audio id='1' type='spice'/>
-		<video>
-      <model type='none'/>
+    <video>
+      <model type='qxl'/>
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x16" slot="0x00" function="0x0"/>
+        <address domain="0x0000" bus="0x15" slot="0x00" function="0x0"/>
       </source>
       <rom bar="off"/>
       <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
     </hostdev>
-    <hostdev mode="subsystem" type="pci" managed="yes">
+  <hostdev mode="subsystem" type="pci" managed="yes">
+    <driver name="vfio"/>
+    <source>
+      <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
+    </source>
+    <alias name="hostdev4"/>
+    <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
+  </hostdev>
+  <hostdev mode="subsystem" type="pci" managed="yes">
+    <driver name="vfio"/>
+    <source>
+      <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
+    </source>
+    <alias name="hostdev5"/>
+    <address type="pci" domain="0x0000" bus="0x05" slot="0x00" function="0x0"/>
+  </hostdev>
+    <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x16" slot="0x00" function="0x1"/>
+        <vendor id="0x0e8d"/>
+        <product id="0x0616"/>
       </source>
-      <rom bar="off"/>
-      <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
-    </hostdev>
-    <hostdev mode="subsystem" type="pci" managed="yes">
-      <source>
-        <address domain="0x0000" bus="0x0e" slot="0x00" function="0x0"/>
-      </source>
-      <address type="pci" domain="0x0000" bus="0x06" slot="0x00" function="0x0"/>
-    </hostdev>
+      <address type="usb" bus="0" port="1"/>
+    </hostdev>    
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>
     <watchdog model='itco' action='reset'/>
     <memballoon model='none'/>
-    <shmem name='looking-glass'>
-      <model type='ivshmem-plain'/>
-      <size unit='M'>256</size>
-      <address type='pci' domain='0x0000' bus='0x10' slot='0x01' function='0x0'/>
-    </shmem>
   </devices>
   <qemu:commandline>
     <qemu:arg value='-fw_cfg'/>
@@ -318,6 +336,12 @@ or other application using the libvirt API.
     <qemu:arg value="socket,id=mon1,server=on,wait=off,path=/tmp/qmp-sock"/>
     <qemu:arg value="-mon"/>
     <qemu:arg value="chardev=mon1,mode=control,pretty=on"/>
+    <qemu:arg value='-device'/>
+    <qemu:arg value='{"driver":"ivshmem-plain","id":"shmem0","memdev":"looking-glass"}'/>
+    <qemu:arg value='-object'/>
+    <qemu:arg value='{"qom-type":"memory-backend-file","id":"looking-glass","mem-path":"/dev/kvmfr0","size":268435456,"share":true}'/>
+    <qemu:arg value="-device"/>
+    <qemu:arg value="{&quot;driver&quot;:&quot;acpi-cppc&quot;,&quot;processors&quot;:[&quot;0:0:261:121:86:12&quot;,&quot;1:0:261:121:86:12&quot;,&quot;2:2:266:121:86:12&quot;,&quot;3:2:266:121:86:12&quot;,&quot;4:4:276:121:86:12&quot;,&quot;5:4:276:121:86:12&quot;,&quot;6:6:256:121:86:12&quot;,&quot;7:6:256:121:86:12&quot;,&quot;8:8:276:121:86:12&quot;,&quot;9:8:276:121:86:12&quot;,&quot;10:10:251:121:86:12&quot;,&quot;11:10:251:121:86:12&quot;,&quot;12:12:271:121:86:12&quot;,&quot;13:12:271:121:86:12&quot;,&quot;14:14:246:121:86:12&quot;,&quot;15:14:246:121:86:12&quot;]}"/>
   </qemu:commandline>
   <qemu:capabilities>
     <qemu:del capability="usb-host.hostdevice"/>

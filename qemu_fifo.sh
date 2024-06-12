@@ -5,28 +5,30 @@ MCPUS=0-7,16-23
 ACPUS=0-31
 
 disable_isolation () {
-        vfio-isolate \
-                cpuset-modify --cpus C$ACPUS /system.slice \
-                cpuset-modify --cpus C$ACPUS /user.slice \
-                irq-affinity mask C$ACPUS
+    vfio-isolate \
+            cpuset-modify --cpus C$ACPUS /system.slice \
+            cpuset-modify --cpus C$ACPUS /user.slice \
+            irq-affinity mask C$ACPUS
 
-        taskset -pc 0-23 2  # kthreadd reset
+    taskset -pc 0-23 2  # kthreadd reset
 }
 
 enable_isolation () {
-        chrt -a -f -p 99 $(pidof qemu-system-x86_64)
-        echo "Set QEMU execution policy!"
-        chrt -p $(pidof qemu-system-x86_64)
+    chrt -a -f -p 99 $(pidof qemu-system-x86_64)
+    echo "Set QEMU execution policy!"
+    chrt -p $(pidof qemu-system-x86_64)
 
-        vfio-isolate \
-                drop-caches \
-                cpuset-modify --cpus C$HCPUS /system.slice \
-                cpuset-modify --cpus C$HCPUS /user.slice \
-                                                                move-tasks / /system.slice \
-                compact-memory \
-                irq-affinity mask C$MCPUS
+    vfio-isolate \
+        drop-caches \
+        cpuset-modify --cpus C$HCPUS /system.slice \
+        cpuset-modify --cpus C$HCPUS /user.slice \
+                                                        move-tasks / /system.slice \
+        compact-memory \
+        irq-affinity mask C$MCPUS
 
-        taskset -pc $HCPUS 2  # kthreadd only on host cores
+    taskset -pc $HCPUS 2  # kthreadd only on host cores
+
+    echo -1 > /proc/sys/kernel/sched_rt_runtime_us
 }
 
 arg="$1"

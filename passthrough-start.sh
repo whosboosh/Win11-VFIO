@@ -1,6 +1,43 @@
 #!/bin/bash
 
-name=win10
+# Necessary for parameter usage in cleanup()
+export TMP_PARAMS="$*"
+TMP_PARAMS+=" --keep-hugepages "
+
+# Perform cleanup after shutdown
+cleanup () {
+
+	# Return CPU power management to default
+	pstate-frequency --set -p auto -n 50
+
+	echo $TMP_PARAMS
+
+	echo "Deleting hugepages..."
+	echo "0" > /proc/sys/vm/nr_hugepages
+
+	echo "Undoing kernel optimizations..."
+    echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
+	echo fff > /sys/devices/virtual/workqueue/cpumask
+	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
+	sysctl vm.stat_interval=1
+	sysctl -w kernel.watchdog=1
+
+	driverctl unset-override 0000:01:00.0
+	driverctl unset-override 0000:01:00.1
+
+	sleep 2
+	./qemu_fifo.sh --cleanup
+}
+
+
+if [[ $TMP_PARAMS == *'--cleanup'* ]]
+then
+	echo "Cleanup only requested!"
+	cleanup
+	exit 0
+fi
+
+name=win11
 redefine=
 optimisations=
 start=
@@ -26,42 +63,6 @@ echo redefine: $redefine
 echo name: $name
 echo start: $start
 
-# Necessary for parameter usage in cleanup()
-export TMP_PARAMS="$*"
-TMP_PARAMS+=" --keep-hugepages "
-
-# Perform cleanup after shutdown
-cleanup () {
-
-	# Return CPU power management to default
-	pstate-frequency --set -p auto -n 50
-
-	echo $TMP_PARAMS
-
-	echo "Deleting hugepages..."
-	echo "0" > /proc/sys/vm/nr_hugepages
-
-	echo "Undoing kernel optimizations..."
-	echo fff > /sys/devices/virtual/workqueue/cpumask
-	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
-	echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
-	sysctl vm.stat_interval=1
-	sysctl -w kernel.watchdog=1
-
-	driverctl unset-override 0000:01:00.0
-	driverctl unset-override 0000:01:00.1	
-
-	sleep 2
-	./qemu_fifo.sh --cleanup
-}
-
-
-if [[ $TMP_PARAMS == *'--cleanup'* ]]
-then
-	echo "Cleanup only requested!"
-	cleanup
-	exit 0
-fi
 
 if [ ! -z $optimisations ]; then
 	# CPU governor settings (keep CPU frequency up, might not work on older CPUs - use cpupower for those)
@@ -98,10 +99,9 @@ if [ ! -z $optimisations ]; then
 
 	echo "Performing minor optimizations prior to launch..."
 	#echo 041 > /sys/devices/virtual/workqueue/cpumask
-	#echo -1 > /proc/sys/kernel/sched_rt_runtime_us	
+	#sysctl -w kernel.sched_rt_runtime_us=-1
 	sysctl vm.stat_interval=120
 	sysctl -w kernel.watchdog=0
-	#sysctl kernel.sched_rt_runtime_us=1000000
 fi
 
 # Set GPU to vfio-pci
@@ -116,13 +116,14 @@ if [ ! -z $redefine ]; then
 fi
 
 if [ ! -z $start ]; then
+    # Fix a bug where RT scheduler will crash host kernel if applied before VM start
+    echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
+
 	# Start VM via virt-manager
 	echo "VM starting..."
 	virsh start $name
 
-	./start-lookingglass.sh
-
-	sleep 20
+	sleep 120
 	./qemu_fifo.sh
 fi
 

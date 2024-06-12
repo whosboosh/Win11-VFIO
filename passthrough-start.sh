@@ -37,7 +37,7 @@ then
 	exit 0
 fi
 
-name=win10
+name=win11
 redefine=
 optimisations=
 start=

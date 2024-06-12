@@ -148,9 +148,9 @@ or other application using the libvirt API.
   <devices>
     <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="1" ioeventfd="on" discard="unmap"/>
-      <source dev="/dev/disk/by-id/nvme-Samsung_SSD_960_EVO_250GB_S3ESNX0J412572A"/>
-      <target dev="vda" bus="virtio"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" discard="unmap"/>
+      <source dev="/dev/disk/by-id/nvme-Phison_ESMP512GMB47C3-E13TS_22272M51245854"/>
+      <target dev="vda" bus="sata"/>
     </disk>
     <disk type="block" device="disk">
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="2" ioeventfd="on" discard="unmap"/>
@@ -305,7 +305,7 @@ or other application using the libvirt API.
     </sound>
     <audio id='1' type='spice'/>
     <video>
-      <model type='none'/>
+      <model type='qxl'/>
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>

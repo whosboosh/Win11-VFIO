@@ -1,31 +1,5 @@
 #!/bin/bash
 
-name=win10
-redefine=
-optimisations=
-start=
-while getopts "orpn:" o; do
-    case "${o}" in
-    o)
-      optimisations=true
-      ;;
-    r)
-      redefine=true
-      ;;
-    n)
-      name=${OPTARG}
-	  shift
-      ;;
-	p)
-	  start=true
-	  ;;
-  esac
-done
-
-echo redefine: $redefine
-echo name: $name
-echo start: $start
-
 # Necessary for parameter usage in cleanup()
 export TMP_PARAMS="$*"
 TMP_PARAMS+=" --keep-hugepages "
@@ -62,6 +36,33 @@ then
 	cleanup
 	exit 0
 fi
+
+name=win10
+redefine=
+optimisations=
+start=
+while getopts "orpn:" o; do
+    case "${o}" in
+    o)
+      optimisations=true
+      ;;
+    r)
+      redefine=true
+      ;;
+    n)
+      name=${OPTARG}
+	  shift
+      ;;
+	p)
+	  start=true
+	  ;;
+  esac
+done
+
+echo redefine: $redefine
+echo name: $name
+echo start: $start
+
 
 if [ ! -z $optimisations ]; then
 	# CPU governor settings (keep CPU frequency up, might not work on older CPUs - use cpupower for those)
@@ -121,8 +122,6 @@ if [ ! -z $start ]; then
 	# Start VM via virt-manager
 	echo "VM starting..."
 	virsh start $name
-
-	./start-lookingglass.sh
 
 	sleep 120
 	./qemu_fifo.sh

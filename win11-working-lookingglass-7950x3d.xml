@@ -278,9 +278,6 @@
     </input>
     <input type='mouse' bus='ps2'/>
     <input type='keyboard' bus='ps2'/>
-    <tpm model='tpm-tis'>
-      <backend type='emulator' version='2.0'/>
-    </tpm>
     <graphics type='spice' autoport='yes'>
       <listen type='address'/>
       <image compression='off'/>

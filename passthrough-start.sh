@@ -14,16 +14,10 @@ cleanup () {
 
 	echo "Deleting hugepages..."
 	echo "0" > /proc/sys/vm/nr_hugepages
-
 	echo "Undoing kernel optimizations..."
     echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
-	echo fff > /sys/devices/virtual/workqueue/cpumask
-	echo fff > /sys/devices/virtual/workqueue/writeback/cpumask
 	sysctl vm.stat_interval=1
 	sysctl -w kernel.watchdog=1
-
-	driverctl unset-override 0000:01:00.0
-	driverctl unset-override 0000:01:00.1
 
 	sleep 2
 	./qemu_fifo.sh --cleanup
@@ -63,7 +57,6 @@ echo redefine: $redefine
 echo name: $name
 echo start: $start
 
-
 if [ ! -z $optimisations ]; then
 	# CPU governor settings (keep CPU frequency up, might not work on older CPUs - use cpupower for those)
 	pstate-frequency --set -p max
@@ -98,16 +91,19 @@ if [ ! -z $optimisations ]; then
 	fi
 
 	echo "Performing minor optimizations prior to launch..."
-	#echo 041 > /sys/devices/virtual/workqueue/cpumask
-	#sysctl -w kernel.sched_rt_runtime_us=-1
+    # schedule real-time processes to have more CPU time
+    echo 1000000 > /proc/sys/kernel/sched_rt_runtime_us
+    # Reduce the virtual memory stat interval to stop polling every second by default
+    # and reduce interrupts
 	sysctl vm.stat_interval=120
-	sysctl -w kernel.watchdog=0
+    # Disable the kernel watchdog timer to prevent NMI interrupts from occuring on lockup detection
+    sysctl -w kernel.watchdog=0
 fi
 
 # Set GPU to vfio-pci
-driverctl set-override 0000:01:00.0 vfio-pci
-driverctl set-override 0000:01:00.1 vfio-pci
-driverctl set-override 0000:15:00.0 vfio-pci
+#driverctl set-override 0000:01:00.0 vfio-pci
+#driverctl set-override 0000:01:00.1 vfio-pci
+#driverctl set-override 0000:16:00.0 vfio-pci
 
 if [ ! -z $redefine ]; then
 # Remove existing VM
@@ -116,9 +112,6 @@ if [ ! -z $redefine ]; then
 fi
 
 if [ ! -z $start ]; then
-    # Fix a bug where RT scheduler will crash host kernel if applied before VM start
-    echo 950000 > /proc/sys/kernel/sched_rt_runtime_us
-
 	# Start VM via virt-manager
 	echo "VM starting..."
 	virsh start $name

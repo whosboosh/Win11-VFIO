@@ -17,13 +17,17 @@
     <discard/>
   </memoryBacking>
  <vcpu placement='static' cpuset='0-7,16-23'>16</vcpu>
-  <iothreads>4</iothreads>
+  <iothreads>8</iothreads>
   <iothreadids>
     <iothread id='1'/>
     <iothread id='2'/>
     <iothread id='3'/>
     <iothread id='4'/>
     <iothread id='5'/>
+    <iothread id='6'/>
+    <iothread id='7'/>
+    <iothread id='8'/>
+    <iothread id='9'/>
   </iothreadids>
   <cputune>
     <vcpupin vcpu='0' cpuset='0'/>
@@ -45,9 +49,13 @@
     <emulatorpin cpuset="24,31"/>
     <iothreadpin iothread="1" cpuset="8,15"/>
     <iothreadpin iothread="2" cpuset="8,15"/>
-    <iothreadpin iothread="3" cpuset="24,31"/>
-    <iothreadpin iothread="4" cpuset="24,31"/>
-    <iothreadpin iothread="5" cpuset="15,21"/>
+    <iothreadpin iothread="3" cpuset="8,15"/>
+    <iothreadpin iothread="4" cpuset="8,15"/>
+    <iothreadpin iothread="5" cpuset="24,31"/>
+    <iothreadpin iothread="6" cpuset="24,31"/>
+    <iothreadpin iothread="7" cpuset="24,31"/>
+    <iothreadpin iothread="8" cpuset="24,31"/>
+    <iothreadpin iothread="9" cpuset="15,21"/>
     <emulatorsched scheduler="fifo" priority="10"/>
     <vcpusched vcpus="0" scheduler="rr" priority="1"/>
     <vcpusched vcpus="1" scheduler="rr" priority="1"/>
@@ -92,6 +100,9 @@
         <feature enabled='yes' name='enrolled-keys'/>
     </firmware>
   </os>
+  <kvm>
+    <hidden state="on"/>
+  </kvm>
   <features>
     <acpi/>
     <apic />
@@ -141,9 +152,9 @@
   <devices>
     <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="1" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/nvme-Phison_ESMP512GMB47C3-E13TS_22272M51245854"/>
-      <target dev="vda" bus="sata"/>
+      <target dev="vda" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="2" ioeventfd="on" discard="unmap"/>
@@ -156,20 +167,19 @@
       <target dev="vdc" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="6" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_55CB50ILKMBX"/>
       <target dev="vdd" bus="virtio"/>
     </disk>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="5" ioeventfd="on" discard="unmap"/>
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="7" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_65PB50FUKMBX"/>
       <target dev="vde" bus="virtio"/>
     </disk>
-    <disk type="file" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="4" ioeventfd="on" discard="unmap"/>
-      <source file="/mnt/storage/library.img" index="1"/>
-      <backingStore/>
-      <target dev="vdg" bus="virtio"/>
+    <disk type="block" device="disk">
+      <driver name="qemu" type="raw" cache="none" io="threads" iothread="8" ioeventfd="on" discard="unmap"/>
+      <source dev="/dev/disk/by-id/nvme-CT2000P3PSSD8_2331E864D1A4"/>
+      <target dev="vdf" bus="virtio"/>
     </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -292,7 +302,7 @@
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
-        <address domain="0x0000" bus="0x15" slot="0x00" function="0x0"/>
+        <address domain="0x0000" bus="0x16" slot="0x00" function="0x0"/>
       </source>
       <rom bar="off"/>
       <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
@@ -304,14 +314,6 @@
     </source>
     <alias name="hostdev4"/>
     <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
-  </hostdev>
-  <hostdev mode="subsystem" type="pci" managed="yes">
-    <driver name="vfio"/>
-    <source>
-      <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
-    </source>
-    <alias name="hostdev5"/>
-    <address type="pci" domain="0x0000" bus="0x05" slot="0x00" function="0x0"/>
   </hostdev>
     <hostdev mode="subsystem" type="usb" managed="yes">
       <source>

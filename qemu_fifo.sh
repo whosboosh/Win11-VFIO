@@ -27,8 +27,6 @@ enable_isolation () {
         irq-affinity mask C$MCPUS
 
     taskset -pc $HCPUS 2  # kthreadd only on host cores
-
-    echo -1 > /proc/sys/kernel/sched_rt_runtime_us
 }
 
 arg="$1"

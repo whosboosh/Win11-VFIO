@@ -152,11 +152,6 @@
   <devices>
     <emulator>/usr/local/bin/qemu-system-x86_64</emulator>
     <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="1" ioeventfd="on" discard="unmap"/>
-      <source dev="/dev/disk/by-id/nvme-Phison_ESMP512GMB47C3-E13TS_22272M51245854"/>
-      <target dev="vda" bus="virtio"/>
-    </disk>
-    <disk type="block" device="disk">
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="2" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-WDC_WD40EFRX-68WT0N0_WD-WCC4E0AETHHT"/>
       <target dev="vdb" bus="virtio"/>
@@ -175,11 +170,6 @@
       <driver name="qemu" type="raw" cache="none" io="threads" iothread="7" ioeventfd="on" discard="unmap"/>
       <source dev="/dev/disk/by-id/ata-OCZ-TRION100_65PB50FUKMBX"/>
       <target dev="vde" bus="virtio"/>
-    </disk>
-    <disk type="block" device="disk">
-      <driver name="qemu" type="raw" cache="none" io="threads" iothread="8" ioeventfd="on" discard="unmap"/>
-      <source dev="/dev/disk/by-id/nvme-CT2000P3PSSD8_2331E864D1A4"/>
-      <target dev="vdf" bus="virtio"/>
     </disk>
     <controller type='usb' index='0' model='nec-xhci' ports='15'>
       <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
@@ -301,27 +291,37 @@
       <model type='qxl'/>
     </video>
     <hostdev mode="subsystem" type="pci" managed="yes">
+      <driver name="vfio"/>
       <source>
-        <address domain="0x0000" bus="0x16" slot="0x00" function="0x0"/>
+        <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
       </source>
-      <rom bar="off"/>
-      <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
+      <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
     </hostdev>
-  <hostdev mode="subsystem" type="pci" managed="yes">
-    <driver name="vfio"/>
-    <source>
-      <address domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
-    </source>
-    <alias name="hostdev4"/>
-    <address type="pci" domain="0x0000" bus="0x02" slot="0x00" function="0x0"/>
-  </hostdev>
+    <hostdev mode="subsystem" type="pci" managed="yes">
+      <source>
+        <address domain="0x0000" bus="0x01" slot="0x00" function="0x1"/>
+      </source>
+      <address type="pci" domain="0x0000" bus="0x0f" slot="0x00" function="0x0"/>
+    </hostdev>
     <hostdev mode="subsystem" type="usb" managed="yes">
       <source>
         <vendor id="0x0e8d"/>
         <product id="0x0616"/>
       </source>
       <address type="usb" bus="0" port="1"/>
-    </hostdev>    
+    </hostdev>
+    <hostdev mode="subsystem" type="pci" managed="yes">
+      <source>
+        <address domain="0x0000" bus="0x14" slot="0x00" function="0x0"/>
+      </source>
+      <address type="pci" domain="0x0000" bus="0x01" slot="0x00" function="0x0"/>
+    </hostdev>
+    <hostdev mode="subsystem" type="pci" managed="yes">
+      <source>
+        <address domain="0x0000" bus="0x04" slot="0x00" function="0x0"/>
+      </source>
+      <address type="pci" domain="0x0000" bus="0x0d" slot="0x00" function="0x0"/>
+    </hostdev>
     <redirdev bus='usb' type='spicevmc'>
       <address type='usb' bus='0' port='3'/>
     </redirdev>

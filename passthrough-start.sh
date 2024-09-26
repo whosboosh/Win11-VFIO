@@ -91,8 +91,6 @@ if [ ! -z $optimisations ]; then
 	fi
 
 	echo "Performing minor optimizations prior to launch..."
-    # schedule real-time processes to have more CPU time
-    echo 1000000 > /proc/sys/kernel/sched_rt_runtime_us
     # Reduce the virtual memory stat interval to stop polling every second by default
     # and reduce interrupts
 	sysctl vm.stat_interval=120
